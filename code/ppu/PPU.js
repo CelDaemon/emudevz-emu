@@ -70,6 +70,7 @@ export default class PPU {
   _onVisibleLine() {
     if(this.cycle == 0) {
       this.backgroundRenderer.renderScanline();
+      this.spriteRenderer.renderScanline();
     }
   }
 
