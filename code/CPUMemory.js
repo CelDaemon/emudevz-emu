@@ -16,12 +16,22 @@ export default class CPUMemory {
     if((address & WRAM_MASK) == 0)
       return this.ram[address & WRAM_MEMORY_MASK];
     
-    return 0;
+    return this.mapper.cpuRead(address);
   }
   write(address, value) {
     if(address < 0)
       throw new Error("Invalid Address");
+    
     if((address & WRAM_MASK) == 0)
-      this.ram[address & WRAM_MEMORY_MASK] = value;
+      return this.ram[address & WRAM_MEMORY_MASK] = value;
+    
+    return this.mapper.cpuWrite(address, value);
+  }
+
+  onLoad(ppu, apu, mapper, controllers) {
+    this.ppu = ppu;
+    this.apu = apu;
+    this.mapper = mapper;
+    this.controllers = controllers;
   }
 }
