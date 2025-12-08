@@ -72,4 +72,63 @@ export default class CPU {
     this.pc.setValue(this.memory.read16(interrupt.vector));
     return 7;
   }
+
+  _fetchOperation() {
+    const opcode = this.memory.read(this.pc.getValue());
+    const operation = this.operations[opcode];
+    if(!operation)
+      throw new Error("Invalid opcode.");
+    this.pc.increment();
+    return operation;
+  }
+
+  _fetchInput(operation) {
+    let value;
+    switch(operation.addressingMode.inputSize) {
+      case 0:
+        return null;
+      case 1:
+        value = this.memory.read(this.pc.getValue());
+        this.pc.increment();
+        return value;
+      case 2:
+        value = this.memory.read16(this.pc.getValue());
+        this.pc.increment(2);
+        return value;
+      default:
+        throw new Error("Invalid input size");
+    }
+  }
+
+  _fetchArgument(operation, input) {
+    if(operation.instruction.argument === "value")
+      return operation.addressingMode.getValue(this, input, operation.hasPageCrossPenalty);
+    return operation.addressingMode.getAddress(this, input, operation.hasPageCrossPenalty);
+  }
+
+  _addCycles(operation) {
+    const cycles = operation.cycles + this.extraCycles;
+    this.cycle += cycles;
+    this.extraCycles = 0;
+    return cycles;
+  }
+
+  step() {
+    const oldPc = this.pc.getValue();
+    const operation = this._fetchOperation();
+    const input = this._fetchInput(operation);
+    const argument = this._fetchArgument(operation, input);
+
+    if(this.logger !== null)  {
+      this.logger(
+        this,
+        oldPc,
+        operation,
+        input,
+        argument
+      )
+    }
+    operation.instruction.run(this, argument);
+    return this._addCycles(operation);
+  }
 }
