@@ -1,5 +1,6 @@
 import PPUMemory from 'PPUMemory';
 import Tile from 'Tile';
+import VideoRegisters from 'VideoRegisters';
 
 
 const FB_WIDTH = 256;
@@ -11,6 +12,8 @@ export default class PPU {
     
     this.frameBuffer = new Uint32Array(FB_WIDTH * FB_HEIGHT);
     this.memory = new PPUMemory();
+
+    this.registers = new VideoRegisters(this);
 
     this.cycle = 0;
     this.scanline = -1;
