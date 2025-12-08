@@ -1,6 +1,7 @@
 import AudioRegisters from 'AudioRegisters';
 import PulseChannel from 'PulseChannel';
 import FrameSequencer from 'FrameSequencer';
+import TriangleChannel from 'TriangleChannel';
 
 export default class APU {
   constructor(cpu) {
@@ -11,7 +12,8 @@ export default class APU {
       pulses: [
         new PulseChannel(this, 0, "enablePulse1"),
         new PulseChannel(this, 1, "enablePulse2")
-      ]
+      ],
+      triangle: new TriangleChannel(this, "enableTriangle")
     };
 
     this.frameSequencer = new FrameSequencer(this);
@@ -30,8 +32,9 @@ export default class APU {
     this.sampleCounter = 0;
     const pulse1 = this.channels.pulses[0].sample();
     const pulse2 = this.channels.pulses[1].sample();
-    this.sample = (pulse1 + pulse2) * 0.01;
-    onSample(this.sample, pulse1, pulse2);
+    const triangle = this.channels.triangle.sample();
+    this.sample = (pulse1 + pulse2 + triangle) * 0.01;
+    onSample(this.sample, pulse1, pulse2, triangle);
   }
 
   onQuarterFrameClock() {

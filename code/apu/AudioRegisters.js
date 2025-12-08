@@ -68,11 +68,11 @@ class TriangleTimerLow extends InMemoryRegister.APU {
 
 class TriangleTimerHighLCL extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("timerHigh", 0, 3);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
   }
 }
 
