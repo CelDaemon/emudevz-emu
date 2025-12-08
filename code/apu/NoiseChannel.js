@@ -1,5 +1,6 @@
-import LengthCounter from "./LengthCounter";
-/* TODO: Check your LengthCounter path ^^^ */
+import LengthCounter from "LengthCounter";
+import noisePeriods from '/lib/apu/noisePeriods';
+import byte from '/lib/byte';
 
 export default class NoiseChannel {
   constructor(apu) {
@@ -7,19 +8,28 @@ export default class NoiseChannel {
 
     this.registers = this.apu.registers.noise;
 
+    this.shift = 1;
+    this.dividerCount = 0;
+
     this.lengthCounter = new LengthCounter();
   }
 
   sample() {
-    if (!this.isEnabled() || !this.lengthCounter.isActive()) return 0;
+    if (!this.isEnabled() || !this.lengthCounter.isActive() || (this.shift & 1)) return 0;
 
     const volume = this.registers.control.volumeOrEnvelopePeriod;
 
-    return Math.floor(this.random() * volume);
+    return volume;
   }
 
   step() {
-    /* TODO: IMPLEMENT */
+    this.dividerCount++;
+    if(this.dividerCount < noisePeriods[this.registers.form.periodId])
+      return;
+    this.dividerCount = 0;
+    const feedback = byte.getBit(this.shift, 0) ^ byte.getBit(this.shift, this.registers.form.mode ? 6 : 1);
+    this.shift >>= 1;
+    this.shift = byte.setBit(this.shift, 14, feedback);
   }
 
   quarterFrame() {

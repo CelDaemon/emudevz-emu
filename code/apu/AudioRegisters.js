@@ -95,11 +95,12 @@ class NoiseControl extends InMemoryRegister.APU {
 
 class NoiseForm extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("periodId", 0, 4)
+      .addField("mode", 7, 1);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
   }
 }
 
