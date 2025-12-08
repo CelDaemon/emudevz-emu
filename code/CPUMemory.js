@@ -7,8 +7,6 @@ const WRAM_SIZE = WRAM_MEMORY_MASK + 1;
 
 const CONTROLLER_ADDRESS = 0x4016;
 
-const APU_ADDRESS = 0x4017;
-
 export default class CPUMemory {
   constructor() {
     this.ram = new Uint8Array(WRAM_SIZE);
@@ -26,6 +24,9 @@ export default class CPUMemory {
 
     if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
       return this.ppu.registers.read(address);
+
+    if((address >= 0x4000 && address <= 0x4013) || address == 0x4015)
+      return this.apu.registers.read(address);
     
     return this.mapper.cpuRead(address);
   }
@@ -47,11 +48,12 @@ export default class CPUMemory {
     if(address == CONTROLLER_ADDRESS)
       return this.controllers[0].onWrite(value);
 
-    if(address == APU_ADDRESS)
-      return;
 
     if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
       return this.ppu.registers.write(address, value);
+
+    if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017)
+      return this.apu.registers.write(address, value);
 
     
     
