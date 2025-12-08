@@ -1,6 +1,10 @@
+import AudioRegisters from 'AudioRegisters';
+
 export default class APU {
   constructor(cpu) {
     this.cpu = cpu;
+
+    this.registers = new AudioRegisters(this);
 
     this.sampleCounter = 0;
     this.sample = 0;
