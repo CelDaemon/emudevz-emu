@@ -66,10 +66,18 @@ class OAMData extends InMemoryRegister.PPU {
 class PPUScroll extends InMemoryRegister.PPU {
   onLoad() {
     /* TODO: IMPLEMENT */
+    this.x = 0;
+    this.y = 0;
   }
 
   onWrite(value) {
     /* TODO: IMPLEMENT */
+    const ppuAddr = this.ppu.registers.ppuAddr;
+    if(!ppuAddr.latch)
+      this.x = value;
+    else
+      this.y = value;
+    ppuAddr.latch = !ppuAddr.latch;
   }
 }
 

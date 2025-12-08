@@ -41,14 +41,11 @@ export default class PPUMemory {
 
     if((address & ADDRESS_MASK) == VRAM_ADDRESS) {
       const relativeAddress = address & VRAM_ADDRESS_MASK;
-      const tableAddress = Math.floor(relativeAddress / VRAM_TABLE_SIZE) * VRAM_TABLE_SIZE;
-      const tablePhysicalAddress = this._mirroring[`$${(VRAM_ADDRESS + tableAddress).toString(16).toUpperCase()}`];
-      console.assert(tablePhysicalAddress != null, "Unknown table base address");
-
+      const tablePhysicalAddress = this.getNameTablePhysicalAddress(relativeAddress);
       return this.vram[tablePhysicalAddress + (relativeAddress % VRAM_TABLE_SIZE)];
     }
 
-    return 0;
+    console.warn("Unmapped read address: ", address.toString(16));
   }
 
   write(address, value) {
@@ -63,11 +60,26 @@ export default class PPUMemory {
     
     if((address & ADDRESS_MASK) == VRAM_ADDRESS) {
       const relativeAddress = address & VRAM_ADDRESS_MASK;
-      const tableAddress = Math.floor(relativeAddress / VRAM_TABLE_SIZE) * VRAM_TABLE_SIZE;
-      const tablePhysicalAddress = this._mirroring[`$${(VRAM_ADDRESS + tableAddress).toString(16).toUpperCase()}`];
-      console.assert(tablePhysicalAddress != null, "Unknown table base address");
-    
+      const tablePhysicalAddress = this.getNameTablePhysicalAddress(relativeAddress);
       return this.vram[tablePhysicalAddress + (relativeAddress % VRAM_TABLE_SIZE)] = value;
+    }
+
+    console.warn("Unmapped write address: ", address.toString(16), "writing: ", value.toString(16));
+  }
+
+  getNameTablePhysicalAddress(vramAddress) {
+    const tableAddress = Math.floor(vramAddress / VRAM_TABLE_SIZE) * VRAM_TABLE_SIZE;
+    switch(tableAddress) {
+      case 0x000:
+        return this._mirroring['$2000'];
+      case 0x400:
+        return this._mirroring['$2400'];
+      case 0x800:
+        return this._mirroring['$2800'];
+      case 0xC00:
+        return this._mirroring['$2C00'];
+      default:
+        throw new Error("Unknown table base address");
     }
   }
 
@@ -76,6 +88,5 @@ export default class PPUMemory {
       mirroringId = "FOUR_SCREEN";
     this.mirroringId = mirroringId;
     this._mirroring = mirroringTypes[mirroringId];
-    console.log(this.mirroringId);
   }
 }
