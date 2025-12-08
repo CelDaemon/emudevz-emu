@@ -42,9 +42,11 @@ export default class SpriteRenderer {
     for(const sprite of sprites) {
       const offsetY = sprite.diffY(y);
       const tileY = offsetY % TILE_SIZE;
-      const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileIdFor(offsetY), tileY);
+      const colorY = sprite.flipY ? 7 - tileY : tileY;
+      const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileIdFor(offsetY), colorY);
       for(let offsetX = 0; offsetX < 8; offsetX++) {
-        const colorIndex = tile.getColorIndex(offsetX);
+        const colorX = sprite.flipX ? 7 - offsetX : offsetX;
+        const colorIndex = tile.getColorIndex(colorX);
         if(colorIndex == 0)
           continue;
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);
