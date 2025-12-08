@@ -35,7 +35,9 @@ class PPUStatus extends InMemoryRegister.PPU {
   }
 
   onRead() {
-    return this.value;
+    const value = this.value;
+    this.isInVBlankInterval = false;
+    return value;
   }
 }
 
