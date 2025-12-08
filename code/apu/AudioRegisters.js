@@ -83,11 +83,13 @@ class TriangleTimerHighLCL extends InMemoryRegister.APU {
 
 class NoiseControl extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("volumeOrEnvelopePeriod", 0, 4)
+      .addField("constantVolume", 4, 1)
+      .addField("envelopeLoopOrLengthCounterHalt", 5, 1);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
   }
 }
 
@@ -103,11 +105,12 @@ class NoiseForm extends InMemoryRegister.APU {
 
 class NoiseLCL extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("lengthCounterLoad", 3, 5);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.channels.noise.lengthCounter.counter = noteLengths[this.lengthCounterLoad];
   }
 }
 
@@ -168,6 +171,8 @@ class APUControl extends InMemoryRegister.APU {
       this.apu.channels.triangle.lengthCounter.reset();
       this.apu.channels.triangle.linearLengthCounter.fullReset();
     }
+    if(!this.enableNoise)
+      this.apu.channels.noise.lengthCounter.reset();
   }
 }
 
