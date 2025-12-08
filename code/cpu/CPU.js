@@ -1,4 +1,4 @@
-import { isByteNegative, isByte, isShort, getFlagMask, isFlagSet } from '../bit';
+import { isByteNegative, isByte, isShort, getFlagMask, isFlagSet, buildShort } from '../bit';
 
 class ArrayRegister {
   constructor(wrapper) {
@@ -124,7 +124,9 @@ class Stack {
   }
 
   pop16() {
-    return this.pop() | this.pop() << 8;
+    const low = this.pop();
+    const high = this.pop();
+    return buildShort(high, low);
   }
 }
 
