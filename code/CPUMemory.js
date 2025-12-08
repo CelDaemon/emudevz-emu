@@ -23,6 +23,11 @@ export default class CPUMemory {
     
     return this.mapper.cpuRead(address);
   }
+
+  read16(address) {
+    return this.read(address + 1) << 8 | this.read(address);
+  }
+  
   write(address, value) {
     if(address < 0)
       throw new Error("Invalid Address");

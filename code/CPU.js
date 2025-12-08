@@ -11,12 +11,12 @@ class ArrayRegister {
     this.wrapper[0] = value;
   }
   
-  increment() {
-    this.wrapper[0]++;
+  increment(value = 1) {
+    this.wrapper[0] += value;
   }
   
-  decrement() {
-    this.wrapper[0]--;
+  decrement(value = 1) {
+    this.wrapper[0] -= value;
   }
 }
 
@@ -94,13 +94,31 @@ class Stack {
     this.memory = memory;
     this.sp = sp;
   }
+
+  getCurrentAddress() {
+    return STACK_ADDRESS + this.sp.getValue();
+  }
+  
   push(value) {
-    this.memory.write(STACK_ADDRESS + this.sp.getValue(), value);
+    this.memory.write(this.getCurrentAddress(), value);
     this.sp.decrement();
   }
+
+  push16(value) {
+    this.push(value >> 8);
+    this.push(value & 0xFF);
+  }
+  
   pop() {
     this.sp.increment();
-    return this.memory.read(STACK_ADDRESS + this.sp.getValue());
+    return this.memory.read(this.getCurrentAddress());
+  }
+
+  pop16() {
+    console.log(this.memory.read16(this.getCurrentAddress() + 1));
+    const real = this.pop() | this.pop() << 8;
+    console.log(real);
+    return real;
   }
 }
 
