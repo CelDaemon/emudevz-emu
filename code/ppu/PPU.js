@@ -73,6 +73,7 @@ export default class PPU {
     if(this.cycle == 1) {
       this.registers.ppuStatus.isInVBlankInterval = 0;
       this.registers.ppuStatus.spriteOverflow = 0;
+      this.registers.ppuStatus.sprite0Hit = 0;
     }
       
     

@@ -93,12 +93,10 @@ const PALETTE_RAM_ADDRESS = 0x3F00;
 
 class PPUData extends InMemoryRegister.PPU {
   onLoad() {
-    /* TODO: IMPLEMENT */
     this.buffer = 0;
   }
 
   onRead() {
-    /* TODO: IMPLEMENT */
     let data = this.buffer;
     const address = this.ppu.registers.ppuAddr.address;
     this.buffer = this.ppu.memory.read(address);

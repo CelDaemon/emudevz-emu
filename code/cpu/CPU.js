@@ -1,3 +1,4 @@
+
 import { isByteNegative, isByte, isShort, isFlagSet, buildShort, getFlagMask } from '../bit';
 import defineOperations from '/lib/cpu/defineOperations';
 import instructions from 'instructions';
@@ -76,9 +77,8 @@ export default class CPU {
   _fetchOperation() {
     const opcode = this.memory.read(this.pc.getValue());
     const operation = this.operations[opcode];
-    if(operation == null) {
+    if(operation == null)
       throw new Error(`Invalid opcode: ${opcode.toString(16)}`);
-    } 
       
     this.pc.increment();
     return operation;
