@@ -19,10 +19,14 @@ class PPUCtrl extends InMemoryRegister.PPU {
 
 class PPUMask extends InMemoryRegister.PPU {
   onLoad() {
-    this.addField("showBackgroundInFirst8Pixels", 1, 1)
+    this.addField("grayscale", 0, 1)
+      .addField("showBackgroundInFirst8Pixels", 1, 1)
       .addField("showSpritesInFirst8Pixels", 2, 1)
       .addField("showBackground", 3, 1)
-      .addField("showSprites", 4, 1);
+      .addField("showSprites", 4, 1)
+      .addField("emphasizeRed", 5, 1)
+      .addField("emphasizeGreen", 6, 1)
+      .addField("emphasizeBlue", 7, 1)
   }
 
   onWrite(value) {
@@ -31,6 +35,37 @@ class PPUMask extends InMemoryRegister.PPU {
 
   isRenderingEnabled() {
     return this.showBackground || this.showSprites;
+  }
+
+  _transformGrayscale(r, g, b) {
+    if(!this.grayscale)
+      return [r, g, b];
+    const gray = Math.floor((r + g + b) / 3);
+    return [gray, gray, gray];
+  }
+
+  _transformEmphasize(r, g, b) {
+    if(!this.emphasizeRed && !this.emphasizeGreen && !this.emphasizeBlue)
+      return [r, g, b];
+
+    const all = this.emphasizeRed && this.emphasizeGreen && this.emphasizeBlue;
+
+    const tr = (all || !this.emphasizeRed) ? Math.floor(r * 0.75) : r;
+    const tg = (all || !this.emphasizeGreen) ? Math.floor(g * 0.75) : g;
+    const tb = (all || !this.emphasizeBlue) ? Math.floor(b * 0.75) : b;
+
+    return [tr, tg, tb];
+  }
+
+  transform(color) {
+    let r = toByte(color);
+    let g = toByte(color >> 8);
+    let b = toByte(color >> 16);
+    [r, g, b] = this._transformGrayscale(r, g, b);
+    [r, g, b] = this._transformEmphasize(r, g, b);
+    
+
+    return 0xFF000000 | r | (g << 8) | (b << 16);
   }
 }
 
