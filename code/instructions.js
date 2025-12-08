@@ -1,5 +1,6 @@
 import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from './bit.js';
 import { FLAG_BREAK } from './CPU.js';
+import interrupts from '/lib/interrupts.js';
 
 function shiftLeft(cpu, value, carry) {
   console.assert(isByte(value), value);
@@ -487,6 +488,19 @@ const instructions = {
     argument: 'no',
     run(cpu) {
       cpu.pc.setValue(cpu.stack.pop16() + 1);
+    }
+  },
+  NOP: {
+    argument: 'no',
+    run() {
+      
+    }
+  },
+  BRK: {
+    argument: 'no',
+    run(cpu) {
+      cpu.pc.increment();
+      cpu.interrupt(interrupts.BRK, true);
     }
   }
 };
