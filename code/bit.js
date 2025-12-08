@@ -17,6 +17,12 @@ export function getShortHighByte(value) {
   return value >> 8;
 }
 
+export function buildShort(high, low) {
+  console.assert(isByte(high), high);
+  console.assert(isByte(low), low);
+  return high << 8 | low;
+}
+
 const BYTE_MASK = 0xFF;
 const SHORT_MASK = 0xFFFF;
 
