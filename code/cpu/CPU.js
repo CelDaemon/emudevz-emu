@@ -76,7 +76,7 @@ export default class CPU {
   _fetchOperation() {
     const opcode = this.memory.read(this.pc.getValue());
     const operation = this.operations[opcode];
-    if(!operation)
+    if(operation == null)
       throw new Error("Invalid opcode.");
     this.pc.increment();
     return operation;
@@ -119,7 +119,7 @@ export default class CPU {
     const input = this._fetchInput(operation);
     const argument = this._fetchArgument(operation, input);
 
-    if(this.logger !== null)  {
+    if(this.logger != null)  {
       this.logger(
         this,
         oldPc,
