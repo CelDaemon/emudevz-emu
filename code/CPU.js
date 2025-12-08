@@ -1,3 +1,5 @@
+import { isByteNegative, isByte, isShort, getFlagMask, isFlagSet } from './bit.js';
+
 class ArrayRegister {
   constructor(wrapper) {
     this.wrapper = wrapper;
@@ -54,34 +56,39 @@ class FlagsRegister {
   }
 
   getValue() {
-    return this.c << FLAG_CARRY |
-      this.z << FLAG_ZERO |
-      this.i << FLAG_INTERRUPT |
-      this.d << FLAG_DECIMAL |
-      0 << FLAG_BREAK |
-      1 << FLAG_UNUSED |
-      this.v << FLAG_OVERFLOW |
-      this.n << FLAG_NEGATIVE;
+    let value = 0;
+    return getFlagMask(FLAG_CARRY, this.c) |
+      getFlagMask(FLAG_ZERO, this.z) |
+      getFlagMask(FLAG_INTERRUPT, this.i) |
+      getFlagMask(FLAG_DECIMAL, this.d) |
+      getFlagMask(FLAG_BREAK, 0) |
+      getFlagMask(FLAG_UNUSED, 1) |
+      getFlagMask(FLAG_OVERFLOW, this.v) |
+      getFlagMask(FLAG_NEGATIVE, this.n);
   }
 
   setValue(value) {
-    this.c = (value >> FLAG_CARRY & 1) != 0;
-    this.z = (value >> FLAG_ZERO & 1) != 0;
-    this.i = (value >> FLAG_INTERRUPT & 1) != 0;
-    this.d = (value >> FLAG_DECIMAL & 1) != 0;
-    this.v = (value >> FLAG_OVERFLOW & 1) != 0;
-    this.n = (value >> FLAG_NEGATIVE & 1) != 0;
+    console.assert(isByte(value), value);
+    this.c = isFlagSet(value, FLAG_CARRY);
+    this.z = isFlagSet(value, FLAG_ZERO);
+    this.i = isFlagSet(value, FLAG_INTERRUPT);
+    this.d = isFlagSet(value, FLAG_DECIMAL);
+    this.v = isFlagSet(value, FLAG_OVERFLOW);
+    this.n = isFlagSet(value, FLAG_NEGATIVE);
   }
 
   updateZero(value) {
+    console.assert(isByte(value), value);
     this.z = value == 0;
   }
 
   updateNegative(value) {
-    this.n = (value >> 7) != 0;
+    console.assert(isByte(value), value);
+    this.n = isByteNegative(value);
   }
 
   updateZeroAndNegative(value) {
+    console.assert(isByte(value), value);
     this.updateZero(value);
     this.updateNegative(value);
   }
@@ -100,11 +107,13 @@ class Stack {
   }
   
   push(value) {
+    console.assert(isByte(value), value);
     this.memory.write(this.getCurrentAddress(), value);
     this.sp.decrement();
   }
 
   push16(value) {
+    console.assert(isShort(value), value);
     this.push(value >> 8);
     this.push(value & 0xFF);
   }
@@ -115,10 +124,7 @@ class Stack {
   }
 
   pop16() {
-    console.log(this.memory.read16(this.getCurrentAddress() + 1));
-    const real = this.pop() | this.pop() << 8;
-    console.log(real);
-    return real;
+    return this.pop() | this.pop() << 8;
   }
 }
 
