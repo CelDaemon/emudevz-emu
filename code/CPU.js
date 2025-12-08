@@ -146,4 +146,15 @@ export default class CPU {
 
     this.stack = new Stack(this.memory, this.sp);
   }
+
+  interrupt(interrupt, withBFlag = false) {
+    if(this.flags.i && interrupt.id === "IRQ")
+      return 0;
+    this.stack.push16(this.pc.getValue());
+    this.stack.push(this.flags.getValue() | getFlagMask(4, withBFlag));
+    this.cycle += 7;
+    this.flags.i = true;
+    this.pc.setValue(this.memory.read16(interrupt.vector));
+    return 7;
+  }
 }
