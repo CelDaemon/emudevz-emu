@@ -1,4 +1,4 @@
-import { isByte, isShort, toSignedByte, toShort, getShortHighByte } from "../bit";
+import { isByte, isShort, toSignedByte, toByte, toShort, getShortHighByte, buildShort } from "../bit";
 
 const unsupported = () => { throw new Error("Unsupported.") };
 function read(cpu, argument, hasPageCrossPenalty) {
@@ -33,10 +33,8 @@ const addressingModes = {
   RELATIVE: {
     inputSize: 1,
     getAddress: (cpu, offset, hasPageCrossPenalty) => {
-      console.assert(isByte(offset), offset);
-      /* TODO: IMPLEMENT */
       const pc = cpu.pc.getValue();
-      const output = toShort(pc + toSignedByte(offset));
+      const output = toShort(pc + toSignedByte(toByte(offset)));
       if(hasPageCrossPenalty && getShortHighByte(pc) != getShortHighByte(output))
         cpu.extraCycles += 2;
       return output;
@@ -56,8 +54,8 @@ const addressingModes = {
   INDEXED_ZERO_PAGE_X: {
     inputSize: 1,
     getAddress: (cpu, zeroPageAddress) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isByte(zeroPageAddress), zeroPageAddress);
+      return toByte(zeroPageAddress + cpu.x.getValue());
     },
     getValue: read
   },
@@ -65,8 +63,8 @@ const addressingModes = {
   INDEXED_ZERO_PAGE_Y: {
     inputSize: 1,
     getAddress: (cpu, zeroPageAddress) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isByte(zeroPageAddress), zeroPageAddress);
+      return toByte(zeroPageAddress + cpu.y.getValue());
     },
     getValue: read
   },
@@ -74,8 +72,11 @@ const addressingModes = {
   INDEXED_ABSOLUTE_X: {
     inputSize: 2,
     getAddress: (cpu, absoluteAddress, hasPageCrossPenalty) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isShort(absoluteAddress), absoluteAddress);
+      const output = toShort(absoluteAddress + cpu.x.getValue());
+      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) != getShortHighByte(output))
+        cpu.extraCycles += 1;
+      return output;
     },
     getValue: read
   },
@@ -83,8 +84,11 @@ const addressingModes = {
   INDEXED_ABSOLUTE_Y: {
     inputSize: 2,
     getAddress: (cpu, absoluteAddress, hasPageCrossPenalty) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isShort(absoluteAddress), absoluteAddress);
+      const output = toShort(absoluteAddress + cpu.y.getValue());
+      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) != getShortHighByte(output))
+        cpu.extraCycles += 1;
+      return output;
     },
     getValue: read
   },
@@ -92,8 +96,9 @@ const addressingModes = {
   INDEXED_INDIRECT: {
     inputSize: 1,
     getAddress: (cpu, zeroPageAddress) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isByte(zeroPageAddress), zeroPageAddress);
+      const address = toByte(zeroPageAddress + cpu.x.getValue());
+      return buildShort(cpu.memory.read(toByte(address + 1)), cpu.memory.read(address));
     },
     getValue: read
   },
@@ -101,8 +106,12 @@ const addressingModes = {
   INDIRECT_INDEXED: {
     inputSize: 1,
     getAddress: (cpu, zeroPageAddress, hasPageCrossPenalty) => {
-      /* TODO: IMPLEMENT */
-      return 0;
+      console.assert(isByte(zeroPageAddress), zeroPageAddress);
+      const base = buildShort(cpu.memory.read(toByte(zeroPageAddress + 1)), cpu.memory.read(zeroPageAddress));
+      const output = toShort(base + cpu.y.getValue());
+      if(hasPageCrossPenalty && getShortHighByte(base) != getShortHighByte(output))
+        cpu.extraCycles += 1;
+      return output;
     },
     getValue: read
   },
