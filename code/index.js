@@ -5,6 +5,7 @@ import CPU from 'cpu/CPU';
 import instructions from 'cpu/instructions';
 import addressingModes from 'cpu/addressingModes';
 import PPU from 'ppu/PPU';
+import APU from 'apu/APU';
 
 export default {
   Cartridge,
@@ -13,5 +14,6 @@ export default {
   CPU,
   instructions,
   addressingModes,
-  PPU
+  PPU,
+  APU
 };
