@@ -1,5 +1,7 @@
 import InMemoryRegister from "/lib/InMemoryRegister";
 
+import { buildShort, getShortHighByte, toByte, toShort, isByte } from '../bit';
+
 class PPUCtrl extends InMemoryRegister.PPU {
   onLoad() {
     this.addField("nameTableId", 0, 2)
@@ -37,6 +39,7 @@ class PPUStatus extends InMemoryRegister.PPU {
   onRead() {
     const value = this.value;
     this.isInVBlankInterval = false;
+    this.ppu.registers.ppuAddr.latch = false;
     return value;
   }
 }
@@ -69,11 +72,16 @@ class PPUScroll extends InMemoryRegister.PPU {
 
 class PPUAddr extends InMemoryRegister.PPU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.latch = false;
+    this.address = 0;
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    if(this.latch)
+      this.address = buildShort(getShortHighByte(this.address), value);
+    else
+      this.address = buildShort(value, toByte(this.address));
+    this.latch = !this.latch;
   }
 }
 
@@ -86,8 +94,17 @@ class PPUData extends InMemoryRegister.PPU {
     /* TODO: IMPLEMENT */
   }
 
+  
+
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.ppu.memory.write(this.ppu.registers.ppuAddr.address, value);
+    this._incrementAddress();
+  }
+
+  _incrementAddress() {
+    const increment = 
+      this.ppu.registers.ppuCtrl.vramAddressIncrement32 ? 32 : 1;
+    this.ppu.registers.ppuAddr.address = toShort(this.ppu.registers.ppuAddr.address + increment);
   }
 }
 
