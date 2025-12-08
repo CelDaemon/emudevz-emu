@@ -1,3 +1,5 @@
+import { isByte, isShort } from './bit.js';
+
 const WRAM_MASK = 0xE000;
 const WRAM_MEMORY_MASK = 0x7FF;
 
@@ -13,6 +15,7 @@ export default class CPUMemory {
   }
 
   read(address) {
+    console.assert(isShort(address), address);
     if(address < 0)
       throw new Error("Invalid Address");
     if((address & WRAM_MASK) == 0)
@@ -25,10 +28,13 @@ export default class CPUMemory {
   }
 
   read16(address) {
+    console.assert(isShort(address), address);
     return this.read(address + 1) << 8 | this.read(address);
   }
   
   write(address, value) {
+    console.assert(isShort(address), address);
+    console.assert(isByte(value), value);
     if(address < 0)
       throw new Error("Invalid Address");
     

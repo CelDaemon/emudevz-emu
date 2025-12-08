@@ -1,3 +1,5 @@
+import { isByte, isFlagSet } from './bit.js';
+
 const BUTTONS = [
   "BUTTON_A",
   "BUTTON_B",
@@ -8,6 +10,8 @@ const BUTTONS = [
   "BUTTON_LEFT",
   "BUTTON_RIGHT"
 ];
+
+const FLAG_STROBE = 0;
 
 export default class Controller {
   constructor(player) {
@@ -36,7 +40,8 @@ export default class Controller {
   }
 
   onWrite(value) {
-    this.strobe = (value & 0x1) != 0;
+    console.assert(isByte(value), value);
+    this.strobe = isFlagSet(value, FLAG_STROBE);
     if(!this.strobe)
       return;
     this.cursor = 0;
