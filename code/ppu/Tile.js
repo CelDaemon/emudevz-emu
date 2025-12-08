@@ -1,12 +1,10 @@
-import { isByte, toShort, buildShort, isFlagSet } from '../bit';
-
-const PATTERN_TABLE_0 = 0x0000;
-const PATTERN_TABLE_1 = 0x1000;
+import { isByte, isBit, toShort, isFlagSet } from '../bit';
 
 export default class Tile {
   constructor(ppu, patternTableId, tileId, y) {
-    console.assert(isByte(patternTableId), patternTableId);
-    const tableAddress = patternTableId << 24;
+    console.assert(isBit(patternTableId), patternTableId);
+    console.assert(isByte(tileId), tileId);
+    const tableAddress = patternTableId << 12;
     const lowPlaneAddress = tableAddress + tileId * 16;
     const highPlaneAddress = lowPlaneAddress + 8;
     this._lowRow = ppu.memory.read(toShort(lowPlaneAddress + y));
@@ -14,6 +12,7 @@ export default class Tile {
   }
 
   getColorIndex(x) {
+    console.assert(x < 8 && x >= 0, x);
     const bit = 7 - x;
     const lowBit = isFlagSet(this._lowRow, bit);
     const highBit = isFlagSet(this._highRow, bit);
