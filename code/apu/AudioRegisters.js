@@ -112,6 +112,7 @@ class NoiseLCL extends InMemoryRegister.APU {
   onWrite(value) {
     this.setValue(value);
     this.apu.channels.noise.lengthCounter.counter = noteLengths[this.lengthCounterLoad];
+    this.apu.channels.noise.volumeEnvelope.startFlag = true;
   }
 }
 

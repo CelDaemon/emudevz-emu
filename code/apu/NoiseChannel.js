@@ -1,4 +1,5 @@
-import LengthCounter from "LengthCounter";
+import LengthCounter from 'LengthCounter';
+import VolumeEnvelope from 'VolumeEnvelope';
 import noisePeriods from '/lib/apu/noisePeriods';
 import byte from '/lib/byte';
 
@@ -12,12 +13,13 @@ export default class NoiseChannel {
     this.dividerCount = 0;
 
     this.lengthCounter = new LengthCounter();
+    this.volumeEnvelope = new VolumeEnvelope();
   }
 
   sample() {
     if (!this.isEnabled() || !this.lengthCounter.isActive() || (this.shift & 1)) return 0;
 
-    const volume = this.registers.control.volumeOrEnvelopePeriod;
+    const volume = this.registers.control.constantVolume ? this.registers.control.volumeOrEnvelopePeriod : this.volumeEnvelope.volume;
 
     return volume;
   }
@@ -33,7 +35,7 @@ export default class NoiseChannel {
   }
 
   quarterFrame() {
-    /* TODO: IMPLEMENT */
+    this.volumeEnvelope.clock(this.registers.control.volumeOrEnvelopePeriod, this.registers.control.envelopeLoopOrLengthCounterHalt);
   }
 
   halfFrame() {
