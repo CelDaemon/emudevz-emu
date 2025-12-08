@@ -15,6 +15,8 @@ export default class PPUMemory {
     /* TODO: IMPLEMENT */
     if((address & MAPPER_MASK) == 0)
       return this.mapper.ppuRead(address);
+    
+    
 
     // 🏞️ Name tables 0 to 3 (VRAM + mirror)
     /* TODO: IMPLEMENT */
@@ -38,6 +40,8 @@ export default class PPUMemory {
     /* TODO: IMPLEMENT */
     if((address & MAPPER_MASK) == 0)
       return this.mapper.ppuWrite(address, value);
+
+    
 
     // 🏞️ Name tables 0 to 3 (VRAM + mirror)
     /* TODO: IMPLEMENT */
