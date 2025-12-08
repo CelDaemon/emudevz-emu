@@ -1,11 +1,14 @@
+import PPUMemory from 'PPUMemory';
+
 const FB_WIDTH = 256;
 const FB_HEIGHT = 240;
 
 export default class PPU {
   constructor(cpu) {
     this.cpu = cpu;
-
+    
     this.frameBuffer = new Uint32Array(FB_WIDTH * FB_HEIGHT);
+    this.memory = new PPUMemory();
 
     this.cycle = 0;
     this.scanline = -1;
