@@ -1,4 +1,4 @@
-import { isByteNegative, isByte, isShort, getFlagMask, isFlagSet } from './bit.js';
+import { isByteNegative, isByte, isShort, getFlagMask, isFlagSet } from '../bit';
 
 class ArrayRegister {
   constructor(wrapper) {

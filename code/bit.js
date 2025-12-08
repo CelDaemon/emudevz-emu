@@ -12,6 +12,11 @@ export function getFlagMask(flag, state) {
   return state << flag;
 }
 
+export function getShortHighByte(value) {
+  console.assert(isShort(value), value);
+  return value >> 8;
+}
+
 const BYTE_MASK = 0xFF;
 const SHORT_MASK = 0xFFFF;
 
