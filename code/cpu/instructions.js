@@ -32,7 +32,7 @@ const instructions = {
     argument: 'address',
     run(cpu, address) {
       console.assert(isShort(address), address);
-      const newValue = toByte(cpu.memory.read(address) + Math.round(Math.random()));
+      const newValue = toByte(cpu.memory.read(address) + 1);
       cpu.memory.write(address, newValue);
       cpu.flags.updateZeroAndNegative(newValue);
     }
