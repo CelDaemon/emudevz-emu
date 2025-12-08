@@ -1,4 +1,5 @@
 import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from './bit.js';
+import { FLAG_BREAK } from './CPU.js';
 
 function shiftLeft(cpu, value, carry) {
   console.assert(isByte(value), value);
@@ -137,7 +138,167 @@ const instructions = {
       console.assert(isByte(subtrahend), subtrahend);
       instructions.ADC.run(cpu, 255 - subtrahend);
     }
-  }
+  },
+  CLC: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.c = false;
+    }
+  },
+  CLD: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.d = false;
+    }
+  },
+  CLI: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.i = false;
+    }
+  },
+  CLV: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.v = false;
+    }
+  },
+  LDA: {
+    argument: 'value',
+    run(cpu, value) {
+      console.assert(isByte(value), value);
+      cpu.a.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  LDX: {
+    argument: 'value',
+    run(cpu, value) {
+      console.assert(isByte(value), value);
+      cpu.x.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  LDY: {
+    argument: 'value',
+    run(cpu, value) {
+      console.assert(isByte(value), value);
+      cpu.y.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  PHA: {
+    argument: 'no',
+    run(cpu) {
+      cpu.stack.push(cpu.a.getValue());
+    }
+  },
+  PHP: {
+    argument: 'no',
+    run(cpu) {
+      cpu.stack.push(cpu.flags.getValue() | getFlagMask(FLAG_BREAK, true));
+    }
+  },
+  PLA: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.stack.pop();
+      cpu.a.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  PLP: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.setValue(cpu.stack.pop());
+    }
+  },
+  SEC: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.c = true;
+    }
+  },
+  SED: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.d = true;
+    }
+  },
+  SEI: {
+    argument: 'no',
+    run(cpu) {
+      cpu.flags.i = true;
+    }
+  },
+  STA: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      cpu.memory.write(address, cpu.a.getValue());
+    }
+  },
+  STX: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      cpu.memory.write(address, cpu.x.getValue());
+    }
+  },
+  STY: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      cpu.memory.write(address, cpu.y.getValue());
+    }
+  },
+  TAX: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.a.getValue();
+      cpu.x.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  TAY: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.a.getValue();
+      cpu.y.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  TSX: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.sp.getValue();
+      cpu.x.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  TXA: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.x.getValue();
+      cpu.a.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
+  TXS: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.x.getValue();
+      cpu.sp.setValue(value);
+    }
+  },
+  TYA: {
+    argument: 'no',
+    run(cpu) {
+      const value = cpu.y.getValue();
+      cpu.a.setValue(value);
+      cpu.flags.updateZeroAndNegative(value);
+    }
+  },
 };
 
 for(const [id, instruction] of Object.entries(instructions)) {
