@@ -65,7 +65,7 @@ export default class CPU {
 
   interrupt(interrupt, withBFlag = false) {
     if(this.flags.i && interrupt.id === "IRQ")
-      return;
+      return 0;
     this.stack.push16(this.pc.getValue());
     this.stack.push(this.flags.getValue() | getFlagMask(4, withBFlag));
     this.cycle += 7;

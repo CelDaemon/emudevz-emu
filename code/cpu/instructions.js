@@ -490,7 +490,7 @@ const instructions = {
   },
   NOP: {
     argument: 'no',
-    run(cpu) {
+    run() {
       
     }
   },
