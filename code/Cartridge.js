@@ -1,9 +1,12 @@
 const MAGIC = "NES";
+
 const PRG_ROM_SIZE_OFFSET = 4;
 const CHR_ROM_SIZE_OFFSET = 5;
 const FLAGS_OFFSET = 6;
 const MAPPER_LOWER_OFFSET = FLAGS_OFFSET;
 const MAPPER_UPPER_OFFSET = 7;
+
+const HEADER_SIZE = 16;
 
 const FLAG_FOUR_SCREEN = 0b1000;
 const FLAG_PADDING = 0b100;
@@ -14,6 +17,8 @@ const FLAG_MIRRORING_VERTICAL = 0b1;
 const MIRRORING_VERTICAL = "VERTICAL";
 const MIRRORING_HORIZONTAL = "HORIZONTAL";
 const MIRRORING_FOUR_SCREEN = "FOUR_SCREEN";
+
+const PAGE_SIZE = 16384;
 
 function getMirroringId(flags) {
   if((flags & FLAG_FOUR_SCREEN) != 0)
@@ -55,5 +60,10 @@ export default class Cartridge {
       mirroringId,
       mapperId
     };
+  }
+
+  prg() {
+    const offset = HEADER_SIZE + (this.header.has512BytePadding ? 512 : 0);
+    return this.bytes.slice(offset, offset + this.header.prgRomPages * PAGE_SIZE);
   }
 }
