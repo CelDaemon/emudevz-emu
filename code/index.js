@@ -4,6 +4,7 @@ import Controller from 'Controller';
 import CPU from 'cpu/CPU';
 import instructions from 'cpu/instructions';
 import addressingModes from 'cpu/addressingModes';
+import PPU from 'ppu/PPU';
 
 export default {
   Cartridge,
@@ -11,5 +12,6 @@ export default {
   Controller,
   CPU,
   instructions,
-  addressingModes
+  addressingModes,
+  PPU
 };
