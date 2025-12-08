@@ -2,12 +2,21 @@ class ArrayRegister {
   constructor(wrapper) {
     this.wrapper = wrapper;
   }
-
+  
   getValue() {
     return this.wrapper[0];
   }
+  
   setValue(value) {
     this.wrapper[0] = value;
+  }
+  
+  increment() {
+    this.wrapper[0]++;
+  }
+  
+  decrement() {
+    this.wrapper[0]--;
   }
 }
 
@@ -25,6 +34,15 @@ class Register16Bit extends ArrayRegister {
   }
 }
 
+const FLAG_CARRY = 0;
+const FLAG_ZERO = 1;
+const FLAG_INTERRUPT = 2;
+const FLAG_DECIMAL = 3;
+const FLAG_BREAK = 4;
+const FLAG_UNUSED = 5;
+const FLAG_OVERFLOW = 6;
+const FLAG_NEGATIVE = 7;
+
 class FlagsRegister {
   constructor() {
     this.c = false;
@@ -36,22 +54,36 @@ class FlagsRegister {
   }
 
   getValue() {
-    return this.c |
-      this.z << 1 |
-      this.i << 2 |
-      this.d << 3 |
-      1 << 5 |
-      this.v << 6 |
-      this.n << 7;
+    return this.c << FLAG_CARRY |
+      this.z << FLAG_ZERO |
+      this.i << FLAG_INTERRUPT |
+      this.d << FLAG_DECIMAL |
+      0 << FLAG_BREAK |
+      1 << FLAG_UNUSED |
+      this.v << FLAG_OVERFLOW |
+      this.n << FLAG_NEGATIVE;
   }
 
   setValue(value) {
-    this.c = (value & 1) != 0;
-    this.z = (value >> 1 & 1) != 0;
-    this.i = (value >> 2 & 1) != 0;
-    this.d = (value >> 3 & 1) != 0;
-    this.v = (value >> 6 & 1) != 0;
-    this.n = (value >> 7 & 1) != 0;
+    this.c = (value >> FLAG_CARRY & 1) != 0;
+    this.z = (value >> FLAG_ZERO & 1) != 0;
+    this.i = (value >> FLAG_INTERRUPT & 1) != 0;
+    this.d = (value >> FLAG_DECIMAL & 1) != 0;
+    this.v = (value >> FLAG_OVERFLOW & 1) != 0;
+    this.n = (value >> FLAG_NEGATIVE & 1) != 0;
+  }
+
+  updateZero(value) {
+    this.z = value == 0;
+  }
+
+  updateNegative(value) {
+    this.n = (value >> 7) != 0;
+  }
+
+  updateZeroAndNegative(value) {
+    this.updateZero(value);
+    this.updateNegative(value);
   }
 }
 
