@@ -25,17 +25,19 @@ class PulseSweep extends InMemoryRegister.APU {
 
 class PulseTimerLow extends InMemoryRegister.APU {
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.channels.pulses[this.id].updateTimer();
   }
 }
 
 class PulseTimerHighLCL extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("timerHigh", 0, 3);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.channels.pulses[this.id].updateTimer();
   }
 }
 
