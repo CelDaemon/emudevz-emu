@@ -1,5 +1,5 @@
-import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from './bit.js';
-import { FLAG_BREAK } from './CPU.js';
+import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from '../bit';
+import { FLAG_BREAK } from 'CPU';
 import interrupts from '/lib/interrupts.js';
 
 function shiftLeft(cpu, value, carry) {
