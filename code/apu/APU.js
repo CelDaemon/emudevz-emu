@@ -7,7 +7,6 @@ export default class APU {
     this.cpu = cpu;
 
     this.registers = new AudioRegisters(this);
-
     this.channels = {
       pulses: [
         new PulseChannel(this, 0, "enablePulse1"),
@@ -36,7 +35,11 @@ export default class APU {
   }
 
   onQuarterFrameClock() {
+    for(const pulse of this.channels.pulses)
+      pulse.quarterFrame();
   }
   onHalfFrameClock() {
+    for(const pulse of this.channels.pulses)
+      pulse.halfFrame();
   }
 }
