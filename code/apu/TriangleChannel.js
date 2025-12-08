@@ -1,4 +1,5 @@
 import LengthCounter from 'LengthCounter';
+import LinearLengthCounter from 'LinearLengthCounter';
 import TriangleOscillator from '/lib/apu/TriangleOscillator';
 import byte from '/lib/byte';
 
@@ -13,10 +14,11 @@ export default class TriangleChannel {
 
     this.oscillator = new TriangleOscillator();
     this.lengthCounter = new LengthCounter();
+    this.linearLengthCounter = new LinearLengthCounter();
   }
 
   sample() {
-    if(!this.isEnabled() || !this.lengthCounter.isActive())
+    if(!this.isEnabled() || !this.lengthCounter.isActive() || !this.linearLengthCounter.isActive())
       return this.previousSample;
     const timer = byte.buildU16(
       this.registers.timerHighLCL.timerHigh,
@@ -33,6 +35,7 @@ export default class TriangleChannel {
   }
 
   quarterFrame() {
+    this.linearLengthCounter.clock(this.isEnabled(), this.registers.lengthControl.halt);
   }
 
   halfFrame() {
