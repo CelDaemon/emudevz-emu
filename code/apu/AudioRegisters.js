@@ -176,6 +176,10 @@ class APUControl extends InMemoryRegister.APU {
     }
     if(!this.enableNoise)
       this.apu.channels.noise.lengthCounter.reset();
+    if(!this.enableDMC)
+      this.apu.channels.dmc.dpcm.stop();
+    else if(this.apu.channels.dmc.dpcm.remainingBytes() === 0)
+      this.apu.channels.dmc.dpcm.start();
   }
 }
 
