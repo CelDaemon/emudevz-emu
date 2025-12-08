@@ -2031,7 +2031,7 @@ it("`FrequencySweep`: `clock()` increases `timer` by <shift delta> when enabled,
     const sweep = channel.frequencySweep;
     const address = i === 0 ? 0x4001 : 0x4005;
 
-    // enable, period=7 (reload=8), shiftCount=2, negateFlag=0
+    // enable, periodMinusOne=7, shiftCount=2, negateFlag=0
     apu.registers.write(address, 0b11110010);
     sweep.startFlag = false;
     sweep.dividerCount = 0;
@@ -2041,7 +2041,7 @@ it("`FrequencySweep`: `clock()` increases `timer` by <shift delta> when enabled,
     sweep.clock();
 
     expect(channel.timer).to.equalN(125, `[${i}].timer`);
-    expect(sweep.dividerCount).to.equalN(8, `[${i}]::dividerCount`);
+    expect(sweep.dividerCount).to.equalN(7, `[${i}]::dividerCount`);
   }
 })({
   locales: {
@@ -2060,7 +2060,7 @@ it("`FrequencySweep`: `clock()` decreases `timer` by <shift delta> when `negateF
     const sweep = channel.frequencySweep;
     const address = i === 0 ? 0x4001 : 0x4005;
 
-    // configure sweep: enable, period=3 (reload=4), shiftCount=2, negateFlag=1
+    // configure sweep: enable, periodMinusOne=3, shiftCount=2, negateFlag=1
     apu.registers.write(address, 0b10111010);
     sweep.startFlag = false;
     sweep.dividerCount = 0;
@@ -2070,7 +2070,7 @@ it("`FrequencySweep`: `clock()` decreases `timer` by <shift delta> when `negateF
     sweep.clock();
 
     expect(channel.timer).to.equalN(75, `[${i}].timer`);
-    expect(sweep.dividerCount).to.equalN(4, `[${i}]::dividerCount`);
+    expect(sweep.dividerCount).to.equalN(3, `[${i}]::dividerCount`);
   }
 })({
   locales: {
@@ -2089,7 +2089,7 @@ it("`FrequencySweep`: `clock()` reloads `dividerCount` and clears `startFlag` wh
     const sweep = channel.frequencySweep;
     const address = i === 0 ? 0x4001 : 0x4005;
 
-    // configure sweep: enable, period=7 (reload=8)
+    // configure sweep: enable,periodMinusOne=7
     apu.registers.write(address, 0b11110010);
     sweep.startFlag = true;
     sweep.dividerCount = 0;
@@ -2097,7 +2097,7 @@ it("`FrequencySweep`: `clock()` reloads `dividerCount` and clears `startFlag` wh
     sweep.clock();
 
     expect(sweep.startFlag).to.equalN(false, `[${i}]::startFlag`);
-    expect(sweep.dividerCount).to.equalN(8, `[${i}]::dividerCount`);
+    expect(sweep.dividerCount).to.equalN(7, `[${i}]::dividerCount`);
   }
 })({
   locales: {

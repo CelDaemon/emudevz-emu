@@ -15,7 +15,7 @@ export default class FrequencySweep {
       this.channel.timer += sweepDelta * (this.channel.registers.sweep.negateFlag ? -1 : 1);
     }
     if(this.dividerCount == 0 || this.startFlag) {
-      this.dividerCount = this.channel.registers.sweep.dividerPeriodMinusOne + 1;
+      this.dividerCount = this.channel.registers.sweep.dividerPeriodMinusOne;
       this.startFlag = false;
       return;
     }

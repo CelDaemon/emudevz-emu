@@ -27,7 +27,7 @@ export default class PulseChannel {
 
   sample() {
     if(this.frequencySweep.mute || !this.isEnabled() || !this.lengthCounter.isActive())
-      return this.previousSample;
+      return this.previousSample; // TODO: Documentation suggests 0 should be returned, rectify this?
     this.oscillator.frequency = CPU_FREQ / (16 * (this.timer + 1));
     this.oscillator.dutyCycle = this.registers.control.dutyCycleId;
     this.oscillator.volume = this.registers.control.constantVolume ?
