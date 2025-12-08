@@ -42,6 +42,7 @@ class PulseTimerHighLCL extends InMemoryRegister.APU {
     this.apu.channels.pulses[this.id].updateTimer();
     this.apu.channels.pulses[this.id].lengthCounter.counter = 
       noteLengths[this.lengthCounterLoad];
+    this.apu.channels.pulses[this.id].volumeEnvelope.startFlag = true;
   }
 }
 
