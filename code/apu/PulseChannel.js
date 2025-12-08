@@ -1,4 +1,7 @@
 import byte from "/lib/byte";
+import PulseOscillator from '/lib/apu/PulseOscillator';
+
+const CPU_FREQ = 1789773;
 
 export default class PulseChannel {
   constructor(apu, id, enableFlagName) {
@@ -9,11 +12,15 @@ export default class PulseChannel {
 
     this.timer = 0;
     this.registers = this.apu.registers.pulses[this.id];
+
+    this.oscillator = new PulseOscillator();
   }
 
   sample() {
-    /* TODO: IMPLEMENT */
-    return 0;
+    this.oscillator.frequency = CPU_FREQ / (16 * (this.timer + 1));
+    this.oscillator.dutyCycle = this.apu.registers.pulses[this.id].control.dutyCycleId;
+    this.oscillator.volume = this.apu.registers.pulses[this.id].control.volumeOrEnvelopePeriod;
+    return this.oscillator.sample();
   }
 
   updateTimer() {
