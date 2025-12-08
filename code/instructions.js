@@ -364,6 +364,130 @@ const instructions = {
       cpu.a.setValue(output);
       cpu.flags.updateZeroAndNegative(output);
     }
+  },
+  BCC: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(cpu.flags.c) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BNE: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(cpu.flags.z) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BPL: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(cpu.flags.n) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BVC: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(cpu.flags.v) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BCS: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(!cpu.flags.c) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BEQ: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(!cpu.flags.z) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BMI: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(!cpu.flags.n) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  BVS: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      if(!cpu.flags.v) {
+        cpu.extraCycles = 0;
+        return;
+      }
+      cpu.extraCycles++;
+      cpu.pc.setValue(address);
+    }
+  },
+  JMP: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      cpu.pc.setValue(address);
+    }
+  },
+  JSR: {
+    argument: 'address',
+    run(cpu, address) {
+      console.assert(isShort(address), address);
+      cpu.stack.push16(cpu.pc.getValue() - 1);
+      cpu.pc.setValue(address);
+    }
+  },
+  RTI: {
+    argument: 'no',
+    run(cpu) {
+      instructions.PLP.run(cpu);
+      cpu.pc.setValue(cpu.stack.pop16());
+    }
+  },
+  RTS: {
+    argument: 'no',
+    run(cpu) {
+      cpu.pc.setValue(cpu.stack.pop16() + 1);
+    }
   }
 };
 
