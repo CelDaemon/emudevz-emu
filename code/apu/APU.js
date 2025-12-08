@@ -1,5 +1,6 @@
 import AudioRegisters from 'AudioRegisters';
 import PulseChannel from 'PulseChannel';
+import FrameSequencer from 'FrameSequencer';
 
 export default class APU {
   constructor(cpu) {
@@ -14,6 +15,8 @@ export default class APU {
       ]
     };
 
+    this.frameSequencer = new FrameSequencer(this);
+
     this.sampleCounter = 0;
     this.sample = 0;
   }
@@ -21,12 +24,19 @@ export default class APU {
   step(onSample) {
     for(const pulse of this.channels.pulses)
       pulse.step();
-    if(++this.sampleCounter != 20)
+    this.sampleCounter++;
+    this.frameSequencer.step();
+    if(this.sampleCounter != 20)
       return;
     this.sampleCounter = 0;
     const pulse1 = this.channels.pulses[0].sample();
     const pulse2 = this.channels.pulses[1].sample();
     this.sample = (pulse1 + pulse2) * 0.01;
     onSample(this.sample, pulse1, pulse2);
+  }
+
+  onQuarterFrameClock() {
+  }
+  onHalfFrameClock() {
   }
 }
