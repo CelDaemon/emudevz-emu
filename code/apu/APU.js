@@ -1,4 +1,5 @@
 import AudioRegisters from 'AudioRegisters';
+import PulseChannel from 'PulseChannel';
 
 export default class APU {
   constructor(cpu) {
@@ -6,19 +7,26 @@ export default class APU {
 
     this.registers = new AudioRegisters(this);
 
+    this.channels = {
+      pulses: [
+        new PulseChannel(this, 0, "enablePulse1"),
+        new PulseChannel(this, 1, "enablePulse2")
+      ]
+    };
+
     this.sampleCounter = 0;
     this.sample = 0;
   }
 
   step(onSample) {
+    for(const pulse of this.channels.pulses)
+      pulse.step();
     if(++this.sampleCounter != 20)
       return;
     this.sampleCounter = 0;
-    this.time = (this.time || 0) + 1 / 44100;
-    const frequency = 440;
-    const period = 1 / frequency;
-    const dutyCycle = 0.5;
-    this.sample = (this.time % period) < period * dutyCycle ? 1 : 0;
-    onSample(this.sample);
+    const pulse1 = this.channels.pulses[0].sample();
+    const pulse2 = this.channels.pulses[1].sample();
+    this.sample = (pulse1 + pulse2) * 0.01;
+    onSample(this.sample, pulse1, pulse2);
   }
 }
