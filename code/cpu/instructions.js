@@ -305,11 +305,9 @@ const instructions = {
     run(cpu, mask) {
       console.assert(isByte(mask), mask);
       const value = cpu.a.getValue();
-      const newValue = toByte(value & mask);
-      cpu.a.setValue(newValue);
       cpu.flags.n = isFlagSet(mask, 7);
       cpu.flags.v = isFlagSet(mask, 6);
-      cpu.flags.z = newValue == 0;
+      cpu.flags.z = (value & mask) == 0;
     }
   },
   CMP: {

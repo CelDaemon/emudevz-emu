@@ -46,7 +46,10 @@ const addressingModes = {
     inputSize: 2,
     getAddress: (cpu, absoluteAddress) => {
       console.assert(isShort(absoluteAddress), absoluteAddress);
-      return cpu.memory.read16(absoluteAddress);
+      // return cpu.memory.read16(absoluteAddress);
+      const page = getShortHighByte(absoluteAddress);
+      const highAddress = buildShort(page, toByte(absoluteAddress + 1));
+      return buildShort(cpu.memory.read(highAddress), cpu.memory.read(absoluteAddress));
     },
     getValue: unsupported
   },
