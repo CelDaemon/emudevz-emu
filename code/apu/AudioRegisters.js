@@ -52,11 +52,11 @@ class PulseTimerHighLCL extends InMemoryRegister.APU {
 
 class TriangleLengthControl extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("halt", 7, 1);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
   }
 }
 
@@ -68,11 +68,13 @@ class TriangleTimerLow extends InMemoryRegister.APU {
 
 class TriangleTimerHighLCL extends InMemoryRegister.APU {
   onLoad() {
-    this.addField("timerHigh", 0, 3);
+    this.addField("timerHigh", 0, 3)
+      .addField("lengthCounterLoad", 3, 5);
   }
 
   onWrite(value) {
     this.setValue(value);
+    this.apu.channels.triangle.lengthCounter.counter = noteLengths[this.lengthCounterLoad];
   }
 }
 
@@ -159,6 +161,8 @@ class APUControl extends InMemoryRegister.APU {
       this.apu.channels.pulses[0].lengthCounter.reset();
     if(!this.enablePulse2)
       this.apu.channels.pulses[1].lengthCounter.reset();
+    if(!this.enableTriangle)
+      this.apu.channels.triangle.lengthCounter.reset();
   }
 }
 

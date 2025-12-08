@@ -40,9 +40,11 @@ export default class APU {
   onQuarterFrameClock() {
     for(const pulse of this.channels.pulses)
       pulse.quarterFrame();
+    this.channels.triangle.quarterFrame();
   }
   onHalfFrameClock() {
     for(const pulse of this.channels.pulses)
       pulse.halfFrame();
+    this.channels.triangle.halfFrame();
   }
 }

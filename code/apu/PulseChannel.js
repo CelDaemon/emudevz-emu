@@ -15,13 +15,14 @@ export default class PulseChannel {
 
     this.timer = 0;
     this.registers = this.apu.registers.pulses[this.id];
+    this.previousSample = 0;
 
     this.oscillator = new PulseOscillator();
     this.lengthCounter = new LengthCounter();
     this.volumeEnvelope = new VolumeEnvelope();
     this.frequencySweep = new FrequencySweep(this);
 
-    this.previousSample = 0;
+    
   }
 
   sample() {
