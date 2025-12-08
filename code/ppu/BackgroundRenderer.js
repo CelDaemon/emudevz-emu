@@ -36,7 +36,7 @@ export default class BackgroundRenderer {
         const x = tileX * TILE_SIZE + offsetX;
         const colorIndex = tile.getColorIndex(offsetX);
         const color = colorIndex != 0 ? this.ppu.getColor(paletteId, colorIndex) : this.ppu.getColor(0, 0);
-        this.ppu.plot(x, y, color);
+        this.ppu.plotBG(x, y, color, colorIndex);
       }
     }
   }
