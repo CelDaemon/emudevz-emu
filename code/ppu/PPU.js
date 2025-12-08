@@ -3,6 +3,7 @@ import BackgroundRenderer from 'BackgroundRenderer';
 import SpriteRenderer from 'SpriteRenderer';
 import Tile from 'Tile';
 import VideoRegisters from 'VideoRegisters';
+import LoopyRegister from '/lib/ppu/LoopyRegister';
 import interrupts from '/lib/interrupts';
 import masterPalette from '/lib/ppu/masterPalette';
 
@@ -24,6 +25,8 @@ export default class PPU {
 
     this.registers = new VideoRegisters(this);
 
+    this.loopy = new LoopyRegister();
+
     this.cycle = 0;
     this.scanline = -1;
     this.frame = 0;
@@ -36,6 +39,8 @@ export default class PPU {
   plotBG(x, y, color, colorIndex) {
     this.colorIndexes[y * FB_WIDTH + x] = colorIndex;
     this.plot(x, y, color);
+    if(this.registers.ppuMask.showBackground)
+      this.loopy.onPlot(x);
   }
 
   isBackgroundPixelOpaque(x, y) {
@@ -77,7 +82,7 @@ export default class PPU {
       this.registers.ppuStatus.spriteOverflow = 0;
       this.registers.ppuStatus.sprite0Hit = 0;
     }
-      
+    this.loopy.onPreLine(this.cycle);
     
   }
 
@@ -88,6 +93,8 @@ export default class PPU {
     }
     if(!this.registers.ppuMask.isRenderingEnabled())
       return;
+
+    this.loopy.onVisibleLine(this.cycle);
   }
 
   _onVBlankLine(onInterrupt) {
