@@ -1,4 +1,5 @@
 import Sprite from '/lib/ppu/Sprite';
+import Tile from 'Tile';
 
 const SPRITE_SIZE = 4;
 
@@ -10,6 +11,11 @@ const SPRITE_X = 3;
 export default class SpriteRenderer {
   constructor(ppu) {
     this.ppu = ppu;
+  }
+
+  renderScanline() {
+    const sprites = this._evaluate();
+    this._render(sprites);
   }
 
   _evaluate() {
@@ -27,6 +33,21 @@ export default class SpriteRenderer {
 
     return sprites.reverse();
     
+  }
+
+  _render(sprites) {
+    const y = this.ppu.scanline;
+    for(const sprite of sprites) {
+      const offsetY = sprite.diffY(y);
+      const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileId, offsetY);
+      for(let offsetX = 0; offsetX < 8; offsetX++) {
+        const colorIndex = tile.getColorIndex(offsetX);
+        if(colorIndex == 0)
+          continue;
+        const color = this.ppu.getColor(sprite.paletteId, colorIndex);
+        this.ppu.plot(sprite.x + offsetX, y, color);
+      }
+    }
   }
 
   _createSprite(id) {
