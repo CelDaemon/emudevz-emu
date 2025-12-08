@@ -1,8 +1,14 @@
-const MAPPER_MASK = 0xE000;
+const ADDRESS_MASK = 0xE000;
+
+const VRAM_ADDRESS = 0x2000;
+
+const VRAM_SIZE = 4096;
+
+const VRAM_ADDRESS_MASK = 0x0FFF;
 
 export default class PPUMemory {
   constructor() {
-    /* TODO: IMPLEMENT */
+    this.vram = new Uint8Array(VRAM_SIZE);
   }
 
   onLoad(cartridge, mapper) {
@@ -11,19 +17,13 @@ export default class PPUMemory {
   }
 
   read(address) {
-    // 🕊️ Pattern tables 0 and 1 (mapper)
-    /* TODO: IMPLEMENT */
-    if((address & MAPPER_MASK) == 0)
+    if((address & ADDRESS_MASK) == 0)
       return this.mapper.ppuRead(address);
     
     
 
-    // 🏞️ Name tables 0 to 3 (VRAM + mirror)
-    /* TODO: IMPLEMENT */
-
-    // 🚽 Mirrors of $2000-$2EFF
-    if (address >= 0x3000 && address <= 0x3eff)
-      return this.read(0x2000 + ((address - 0x3000) % 0x1000));
+    if((address & ADDRESS_MASK) == 0x2000)
+      return this.vram[VRAM_ADDRESS + address & VRAM_ADDRESS_MASK];
 
     // 🎨 Palette RAM
     /* TODO: IMPLEMENT */
@@ -36,15 +36,12 @@ export default class PPUMemory {
   }
 
   write(address, value) {
-    // 🕊️ Pattern tables 0 and 1 (mapper)
-    /* TODO: IMPLEMENT */
-    if((address & MAPPER_MASK) == 0)
+    if((address & ADDRESS_MASK) == 0)
       return this.mapper.ppuWrite(address, value);
 
     
-
-    // 🏞️ Name tables 0 to 3 (VRAM + mirror)
-    /* TODO: IMPLEMENT */
+    if((address & ADDRESS_MASK) == 0x2000)
+      return this.vram[VRAM_ADDRESS + address & VRAM_ADDRESS_MASK] = value;
 
     // 🚽 Mirrors of $2000-$2EFF
     if (address >= 0x3000 && address <= 0x3eff)
