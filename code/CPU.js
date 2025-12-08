@@ -36,14 +36,14 @@ class Register16Bit extends ArrayRegister {
   }
 }
 
-const FLAG_CARRY = 0;
-const FLAG_ZERO = 1;
-const FLAG_INTERRUPT = 2;
-const FLAG_DECIMAL = 3;
-const FLAG_BREAK = 4;
-const FLAG_UNUSED = 5;
-const FLAG_OVERFLOW = 6;
-const FLAG_NEGATIVE = 7;
+export const FLAG_CARRY = 0;
+export const FLAG_ZERO = 1;
+export const FLAG_INTERRUPT = 2;
+export const FLAG_DECIMAL = 3;
+export const FLAG_BREAK = 4;
+export const FLAG_UNUSED = 5;
+export const FLAG_OVERFLOW = 6;
+export const FLAG_NEGATIVE = 7;
 
 class FlagsRegister {
   constructor() {
