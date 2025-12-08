@@ -1,6 +1,7 @@
 import PPUMemory from 'PPUMemory';
 import Tile from 'Tile';
 import VideoRegisters from 'VideoRegisters';
+import interrupts from '/lib/interrupts';
 
 
 const FB_WIDTH = 256;
@@ -24,7 +25,13 @@ export default class PPU {
     this.frameBuffer[y * FB_WIDTH + x] = color;
   }
   
-  step(onFrame) {
+  step(onFrame, onInterrupt) {
+    if(this.scanline == -1)
+      this._onPreLine();
+    else if(this.scanline < FB_HEIGHT)
+      this._onVisibleLine();
+    else if(this.scanline == FB_HEIGHT + 1)
+      this._onVBlankLine(onInterrupt);
     this.cycle++;
     if(this.cycle >= FB_WIDTH + 85) {
       this.cycle = 0;
@@ -62,5 +69,23 @@ export default class PPU {
       }
       onFrame(this.frameBuffer);
     }
+  }
+
+  _onPreLine() {
+    if(this.cycle == 1)
+      this.registers.ppuStatus.isInVBlankInterval = 0;
+  }
+
+  _onVisibleLine() {
+    
+  }
+
+  _onVBlankLine(onInterrupt) {
+    if(this.cycle == 1) {
+      this.registers.ppuStatus.isInVBlankInterval = 1;
+      if(this.registers.ppuCtrl.generateNMIOnVBlank)
+        onInterrupt(interrupts.NMI);
+    }
+      
   }
 }
