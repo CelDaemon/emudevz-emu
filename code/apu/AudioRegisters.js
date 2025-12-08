@@ -151,11 +151,14 @@ class APUControl extends InMemoryRegister.APU {
 
 class APUFrameCounter extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("use5StepSequencer", 7, 1);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.frameSequencer.reset();
+    this.apu.onQuarterFrameClock();
+    this.apu.onHalfFrameClock();
   }
 }
 
