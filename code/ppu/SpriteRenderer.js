@@ -1,5 +1,6 @@
 import Sprite from '/lib/ppu/Sprite';
 import Tile from 'Tile';
+import byte from '/lib/byte';
 
 const SPRITE_SIZE = 4;
 
@@ -20,7 +21,7 @@ export default class SpriteRenderer {
   renderScanline() {
     if(!this.ppu.registers.ppuMask.showSprites)
       return;
-    const sprites = this._evaluate();
+    const sprites = this._evaluate().reverse();
     this._render(sprites);
   }
 
@@ -36,13 +37,11 @@ export default class SpriteRenderer {
       }
       sprites.push(sprite);
     }
-
     return sprites.reverse();
-    
   }
 
   _render(sprites) {
-    const attemptsBuffer = new Uint8Array(FB_WIDTH);
+    const attempts = new Uint8Array(FB_WIDTH / 8);
     const y = this.ppu.scanline;
     for(const sprite of sprites) {
       const offsetY = sprite.diffY(y);
@@ -52,12 +51,17 @@ export default class SpriteRenderer {
       for(let offsetX = 0; offsetX < 8; offsetX++) {
         // TODO fix sprite masking through priority quirk
         const x = sprite.x + offsetX;
+        const attemptByteIndex = Math.floor(x / 8);
+        const attemptBitIndex = x % 8;
+        if(byte.getFlag(attempts[attemptByteIndex], x % 8))
+          continue;
         if(!this.ppu.registers.ppuMask.showSpritesInFirst8Pixels && x < 8)
           continue;
         const colorX = sprite.flipX ? 7 - offsetX : offsetX;
         const colorIndex = tile.getColorIndex(colorX);
         if(colorIndex == 0)
           continue;
+        attempts[attemptByteIndex] = byte.setBit(attempts[attemptByteIndex], attemptBitIndex, true);
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);
         if(this.ppu.registers.ppuMask.showBackground && this.ppu.isBackgroundPixelOpaque(x, y)) {
           if(sprite.id == 0)
