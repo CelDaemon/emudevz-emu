@@ -16,11 +16,15 @@ class PulseControl extends InMemoryRegister.APU {
 
 class PulseSweep extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("shiftCount", 0, 3)
+      .addField("negateFlag", 3, 1)
+      .addField("dividerPeriodMinusOne", 4, 3)
+      .addField("enabledFlag", 7, 1);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.channels.pulses[this.id].frequencySweep.startFlag = true;
   }
 }
 

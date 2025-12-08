@@ -2,6 +2,7 @@ import byte from "/lib/byte";
 import PulseOscillator from '/lib/apu/PulseOscillator';
 import LengthCounter from 'LengthCounter';
 import VolumeEnvelope from 'VolumeEnvelope';
+import FrequencySweep from 'FrequencySweep';
 
 const CPU_FREQ = 1789773;
 
@@ -18,17 +19,18 @@ export default class PulseChannel {
     this.oscillator = new PulseOscillator();
     this.lengthCounter = new LengthCounter();
     this.volumeEnvelope = new VolumeEnvelope();
+    this.frequencySweep = new FrequencySweep(this);
 
     this.previousSample = 0;
   }
 
   sample() {
-    if(!this.isEnabled() || !this.lengthCounter.isActive())
+    if(this.frequencySweep.mute || !this.isEnabled() || !this.lengthCounter.isActive())
       return this.previousSample;
     this.oscillator.frequency = CPU_FREQ / (16 * (this.timer + 1));
-    this.oscillator.dutyCycle = this.apu.registers.pulses[this.id].control.dutyCycleId;
-    this.oscillator.volume = this.apu.registers.pulses[this.id].control.constantVolume ?
-      this.apu.registers.pulses[this.id].control.volumeOrEnvelopePeriod :
+    this.oscillator.dutyCycle = this.registers.control.dutyCycleId;
+    this.oscillator.volume = this.registers.control.constantVolume ?
+      this.registers.control.volumeOrEnvelopePeriod :
       this.volumeEnvelope.volume;
     this.previousSample = this.oscillator.sample();
     return this.previousSample;
@@ -42,7 +44,9 @@ export default class PulseChannel {
   }
 
   step() {
-    this.updateTimer();
+    this.frequencySweep.muteIfNeeded();
+    if(!this.registers.sweep.enabledFlag)
+      this.updateTimer();
   }
 
   isEnabled() {
@@ -50,11 +54,11 @@ export default class PulseChannel {
   }
 
   quarterFrame() {
-    const pulseControl = this.apu.registers.pulses[this.id].control;
-    this.volumeEnvelope.clock(pulseControl.volumeOrEnvelopePeriod, pulseControl.envelopeLoopOrLengthCounterHalt);
+    this.volumeEnvelope.clock(this.registers.control.volumeOrEnvelopePeriod, this.registers.control.envelopeLoopOrLengthCounterHalt);
   }
 
   halfFrame() {
-    this.lengthCounter.clock(this.isEnabled(), this.apu.registers.pulses[this.id].control.envelopeLoopOrLengthCounterHalt);
+    this.lengthCounter.clock(this.isEnabled(), this.registers.control.envelopeLoopOrLengthCounterHalt);
+    this.frequencySweep.clock();
   }
 }
