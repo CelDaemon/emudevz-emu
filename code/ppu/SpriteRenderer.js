@@ -51,8 +51,12 @@ export default class SpriteRenderer {
           continue;
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);
         const x = sprite.x + offsetX;
-        if(!sprite.isInFrontOfBackground && this.ppu.isBackgroundPixelOpaque(x, y))
-          continue;
+        if(this.ppu.isBackgroundPixelOpaque(x, y)) {
+          if(sprite.id === 0)
+            this.ppu.registers.ppuStatus.sprite0Hit = 1;
+          if(!sprite.isInFrontOfBackground)
+            continue;
+        }
         this.ppu.plot(x, y, color);
       }
     }
