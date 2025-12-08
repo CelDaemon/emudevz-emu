@@ -18,7 +18,8 @@ const MIRRORING_VERTICAL = "VERTICAL";
 const MIRRORING_HORIZONTAL = "HORIZONTAL";
 const MIRRORING_FOUR_SCREEN = "FOUR_SCREEN";
 
-const PAGE_SIZE = 16384;
+const PRG_PAGE_SIZE = 16384;
+const CHR_PAGE_SIZE = 8192;
 
 function getMirroringId(flags) {
   if((flags & FLAG_FOUR_SCREEN) != 0)
@@ -26,6 +27,18 @@ function getMirroringId(flags) {
   if((flags & FLAG_MIRRORING_VERTICAL) != 0)
     return MIRRORING_VERTICAL;
   return MIRRORING_HORIZONTAL;
+}
+
+function getPrgOffset(header) {
+  return HEADER_SIZE + (header.has512BytePadding ? 512 : 0);
+}
+
+function getPrgSize(header) {
+  return header.prgRomPages * PRG_PAGE_SIZE;
+}
+
+function getChrOffset(header) {
+  return getPrgOffset(header) + getPrgSize(header);
 }
 
 export default class Cartridge {
@@ -63,7 +76,14 @@ export default class Cartridge {
   }
 
   prg() {
-    const offset = HEADER_SIZE + (this.header.has512BytePadding ? 512 : 0);
-    return this.bytes.slice(offset, offset + this.header.prgRomPages * PAGE_SIZE);
+    const offset = getPrgOffset(this.header);
+    return this.bytes.slice(offset, offset + getPrgSize(this.header));
+  }
+
+  chr() {
+    if(this.header.usesChrRam)
+      return new Uint8Array(CHR_PAGE_SIZE);
+    const offset = getChrOffset(this.header);
+    return this.bytes.slice(offset, offset + this.header.chrRomPages * CHR_PAGE_SIZE);
   }
 }
