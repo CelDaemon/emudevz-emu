@@ -8,6 +8,8 @@ const SPRITE_TILE_ID = 1;
 const SPRITE_ATTRIBUTES = 2;
 const SPRITE_X = 3;
 
+const TILE_SIZE = 8;
+
 export default class SpriteRenderer {
   constructor(ppu) {
     this.ppu = ppu;
@@ -39,9 +41,12 @@ export default class SpriteRenderer {
     const y = this.ppu.scanline;
     for(const sprite of sprites) {
       const offsetY = sprite.diffY(y);
-      const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileId, offsetY);
+      const tileY = offsetY % TILE_SIZE
+      const colorY = sprite.flipY ? 7 - tileY : tileY;
+      const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileIdFor(offsetY), colorY);
       for(let offsetX = 0; offsetX < 8; offsetX++) {
-        const colorIndex = tile.getColorIndex(offsetX);
+        const colorX = sprite.flipX ? 7 - offsetX : offsetX;
+        const colorIndex = tile.getColorIndex(colorX);
         if(colorIndex == 0)
           continue;
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);

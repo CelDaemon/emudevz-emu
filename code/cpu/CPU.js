@@ -75,10 +75,10 @@ export default class CPU {
 
   _fetchOperation() {
     const opcode = this.memory.read(this.pc.getValue());
-    const operation = this.operations[opcode] ?? this.operations[0xea];
+    const operation = this.operations[opcode];
     if(operation == null) {
       throw new Error(`Invalid opcode: ${opcode.toString(16)}`);
-    }
+    } 
       
     this.pc.increment();
     return operation;
