@@ -23,6 +23,9 @@ export default class CPUMemory {
 
     if((address & ~0x1) == CONTROLLER_ADDRESS)
       return this.controllers[address & 0x1].onRead();
+
+    if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
+      return this.ppu.registers.read(address);
     
     return this.mapper.cpuRead(address);
   }
@@ -46,6 +49,11 @@ export default class CPUMemory {
 
     if(address == APU_ADDRESS)
       return;
+
+    if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
+      return this.ppu.registers.write(address, value);
+
+    
     
     return this.mapper.cpuWrite(address, value);
   }
