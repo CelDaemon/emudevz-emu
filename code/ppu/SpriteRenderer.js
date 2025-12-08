@@ -12,8 +12,24 @@ export default class SpriteRenderer {
     this.ppu = ppu;
   }
 
-  _createSprite(id) {
+  _evaluate() {
+    const sprites = [];
+    for(let i = 0; i < 64; i++) {
+      const sprite = this._createSprite(i);
+      if(!sprite.shouldRenderInScanline(this.ppu.scanline))
+        continue;
+      if(sprites.length >= 8) {
+        this.ppu.registers.ppuStatus.spriteOverflow = 1;
+        break;
+      }
+      sprites.push(sprite);
+    }
 
+    return sprites.reverse();
+    
+  }
+
+  _createSprite(id) {
     const ppuCtrl = this.ppu.registers.ppuCtrl;
     const oamRam = this.ppu.memory.oamRam;
     
@@ -31,7 +47,6 @@ export default class SpriteRenderer {
     const patternTableId = 
       isLarge ? oamRam[address + SPRITE_TILE_ID] & 0x1 : ppuCtrl.sprite8x8PatternTableId;
     
-    const sprite = new Sprite(id, x, y, this.ppu.registers.ppuCtrl.spriteSize == 1, patternTableId, tileId, attributes);
-    return sprite;
+    return new Sprite(id, x, y, this.ppu.registers.ppuCtrl.spriteSize == 1, patternTableId, tileId, attributes);
   }
 }
