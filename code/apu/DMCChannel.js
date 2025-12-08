@@ -1,3 +1,5 @@
+import DPCM from '/lib/apu/DPCM';
+
 export default class DMCChannel {
   constructor(apu, cpu) {
     this.apu = apu;
@@ -6,6 +8,8 @@ export default class DMCChannel {
     this.registers = this.apu.registers.dmc;
 
     this.outputSample = 0;
+
+    this.dpcm = new DPCM(this);
   }
 
   sample() {
@@ -13,6 +17,6 @@ export default class DMCChannel {
   }
 
   step() {
-    /* TODO: IMPLEMENT */
+    this.dpcm.update();
   }
 }
