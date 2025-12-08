@@ -1,5 +1,6 @@
 import InMemoryRegister from "/lib/InMemoryRegister";
 import noteLengths from '/lib/apu/noteLengths';
+import byte from '/lib/byte';
 
 class PulseControl extends InMemoryRegister.APU {
   onLoad() {
@@ -151,7 +152,12 @@ class DMCSampleLength extends InMemoryRegister.APU {
 
 class APUStatus extends InMemoryRegister.APU {
   onRead() {
-    /* TODO: IMPLEMENT */
+    return byte.bitfield(
+      this.apu.channels.pulses[0].lengthCounter.counter > 0,
+      this.apu.channels.pulses[1].lengthCounter.counter > 0,
+      this.apu.channels.triangle.lengthCounter.counter > 0,
+      this.apu.channels.noise.lengthCounter.counter > 0,
+      this.apu.channels.dmc.dpcm.remainingBytes() > 0);
   }
 }
 
