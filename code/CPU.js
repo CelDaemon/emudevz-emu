@@ -87,6 +87,23 @@ class FlagsRegister {
   }
 }
 
+const STACK_ADDRESS = 0x0100;
+
+class Stack {
+  constructor(memory, sp) {
+    this.memory = memory;
+    this.sp = sp;
+  }
+  push(value) {
+    this.memory.write(STACK_ADDRESS + this.sp.getValue(), value);
+    this.sp.decrement();
+  }
+  pop() {
+    this.sp.increment();
+    return this.memory.read(STACK_ADDRESS + this.sp.getValue());
+  }
+}
+
 export default class CPU {
   constructor(memory) {
     this.memory = memory;
@@ -102,5 +119,7 @@ export default class CPU {
     this.pc = new Register16Bit();
 
     this.flags = new FlagsRegister();
+
+    this.stack = new Stack(this.memory, this.sp);
   }
 }
