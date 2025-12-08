@@ -10,6 +10,11 @@ export default class APU {
     if(++this.sampleCounter != 20)
       return;
     this.sampleCounter = 0;
+    this.time = (this.time || 0) + 1 / 44100;
+    const frequency = 440;
+    const period = 1 / frequency;
+    const dutyCycle = 0.5;
+    this.sample = (this.time % period) < period * dutyCycle ? 1 : 0;
     onSample(this.sample);
   }
 }
