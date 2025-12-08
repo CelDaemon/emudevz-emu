@@ -1,5 +1,6 @@
 import PPUMemory from 'PPUMemory';
 import BackgroundRenderer from 'BackgroundRenderer';
+import SpriteRenderer from 'SpriteRenderer';
 import Tile from 'Tile';
 import VideoRegisters from 'VideoRegisters';
 import interrupts from '/lib/interrupts';
@@ -17,6 +18,7 @@ export default class PPU {
     this.frameBuffer = new Uint32Array(FB_WIDTH * FB_HEIGHT);
     this.memory = new PPUMemory();
     this.backgroundRenderer = new BackgroundRenderer(this);
+    this.spriteRenderer = new SpriteRenderer(this);
 
     this.registers = new VideoRegisters(this);
 
