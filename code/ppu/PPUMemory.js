@@ -9,10 +9,13 @@ const PALETTE_RAM_ADDRESS = 0x3F00;
 const PALETTE_RAM_ADDRESS_MASK = 0x001F;
 const PALETTE_RAM_SIZE = 32;
 
+const OAM_SIZE = 256;
+
 export default class PPUMemory {
   constructor() {
     this.vram = new Uint8Array(VRAM_SIZE);
     this.paletteRam = new Uint8Array(PALETTE_RAM_SIZE);
+    this.oamRam = new Uint8Array(OAM_SIZE);
   }
 
   onLoad(cartridge, mapper) {
