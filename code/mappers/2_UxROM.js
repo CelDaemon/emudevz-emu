@@ -1,8 +1,7 @@
 import Mapper from '/lib/Mapper';
 
 export default class UxROM extends Mapper {
-  constructor(cpu, ppu, cartridge) {
-    super(cpu, ppu, cartridge);
+  onLoad() {
     this.page = 0;
   }
 
