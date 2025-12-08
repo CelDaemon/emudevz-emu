@@ -52,11 +52,14 @@ class OAMAddr extends InMemoryRegister.PPU {
 
 class OAMData extends InMemoryRegister.PPU {
   onRead() {
-    /* TODO: IMPLEMENT */
+    const oamAddress = this.ppu.registers.oamAddr.value;
+    return this.ppu.memory.oamRam[oamAddress];
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    const oamAddress = this.ppu.registers.oamAddr.value;
+    this.ppu.memory.oamRam[oamAddress] = value;
+    this.ppu.registers.oamAddr.setValue(oamAddress + 1);
   }
 }
 
@@ -120,8 +123,13 @@ class PPUData extends InMemoryRegister.PPU {
 }
 
 class OAMDMA extends InMemoryRegister.PPU {
-  onWrite(value) {
-    /* TODO: IMPLEMENT */
+  onWrite(page) {
+    for(let i = 0; i < 256; i++) {
+      const address = buildShort(page, i);
+      const value = this.ppu.cpu.memory.read(address);
+      this.ppu.memory.oamRam[i] = value;
+    }
+    this.ppu.cpu.extraCycles += 513;
   }
 }
 

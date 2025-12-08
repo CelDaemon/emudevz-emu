@@ -10,7 +10,7 @@ const FB_HEIGHT = 240;
 
 const TILE_SIZE = 8;
 
-const BLOCK_SIZE = 2;
+const ATTRIBUTE_BLOCK_SIZE = 2;
 
 const META_BLOCK_SIZE = 4;
 
@@ -48,10 +48,10 @@ export default class BackgroundRenderer {
     
     const attributes = this.ppu.memory.read(attributeTableAddress + metaBlockX + metaBlockY * (FB_WIDTH / TILE_SIZE / META_BLOCK_SIZE));
 
-    const offsetX = Math.floor((tileX % META_BLOCK_SIZE) / BLOCK_SIZE);
-    const offsetY = Math.floor((tileY % META_BLOCK_SIZE) / BLOCK_SIZE);
+    const attributeX = Math.floor((tileX % META_BLOCK_SIZE) / ATTRIBUTE_BLOCK_SIZE);
+    const attributeY = Math.floor((tileY % META_BLOCK_SIZE) / ATTRIBUTE_BLOCK_SIZE);
     
-    const offset = ((offsetX == 1 ? 1 : 0) + (offsetY == 1 ? 2 : 0)) * 2;
+    const offset = ((attributeX == 1 ? 1 : 0) + (attributeY == 1 ? 2 : 0)) * 2;
     return (attributes >> offset) & 0b11;
   }
 }
