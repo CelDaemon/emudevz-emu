@@ -299,6 +299,72 @@ const instructions = {
       cpu.flags.updateZeroAndNegative(value);
     }
   },
+  BIT: {
+    argument: 'value',
+    run(cpu, mask) {
+      console.assert(isByte(mask), mask);
+      const value = cpu.a.getValue();
+      const newValue = toByte(value & mask);
+      cpu.a.setValue(newValue);
+      cpu.flags.n = isFlagSet(mask, 7);
+      cpu.flags.v = isFlagSet(mask, 6);
+      cpu.flags.z = newValue == 0;
+    }
+  },
+  CMP: {
+    argument: 'value',
+    run(cpu, operand) {
+      console.assert(isByte(operand), operand);
+      const output = cpu.a.getValue() - operand;
+      cpu.flags.c = output >= 0;
+      cpu.flags.updateZeroAndNegative(toByte(output));
+    }
+  },
+  CPX: {
+    argument: 'value',
+    run(cpu, operand) {
+      console.assert(isByte(operand), operand);
+      const output = cpu.x.getValue() - operand;
+      cpu.flags.c = output >= 0;
+      cpu.flags.updateZeroAndNegative(toByte(output));
+    }
+  },
+  CPY: {
+    argument: 'value',
+    run(cpu, operand) {
+      console.assert(isByte(operand), operand);
+      const output = cpu.y.getValue() - operand;
+      cpu.flags.c = output >= 0;
+      cpu.flags.updateZeroAndNegative(toByte(output));
+    }
+  },
+  AND: {
+    argument: 'value',
+    run(cpu, mask) {
+      console.assert(isByte(mask), mask);
+      const output = cpu.a.getValue() & mask;
+      cpu.a.setValue(output);
+      cpu.flags.updateZeroAndNegative(output);
+    }
+  },
+  EOR: {
+    argument: 'value',
+    run(cpu, mask) {
+      console.assert(isByte(mask), mask);
+      const output = cpu.a.getValue() ^ mask;
+      cpu.a.setValue(output);
+      cpu.flags.updateZeroAndNegative(output);
+    }
+  },
+  ORA: {
+    argument: 'value',
+    run(cpu, mask) {
+      console.assert(isByte(mask), mask);
+      const output = cpu.a.getValue() | mask;
+      cpu.a.setValue(output);
+      cpu.flags.updateZeroAndNegative(output);
+    }
+  }
 };
 
 for(const [id, instruction] of Object.entries(instructions)) {
