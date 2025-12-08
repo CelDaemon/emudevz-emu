@@ -21,9 +21,8 @@ export default class PPUMemory {
       return this.mapper.ppuRead(address);
     
     
-
-    if((address & ADDRESS_MASK) == 0x2000)
-      return this.vram[VRAM_ADDRESS + address & VRAM_ADDRESS_MASK];
+    if((address & ADDRESS_MASK) == VRAM_ADDRESS)
+      return this.vram[address & VRAM_ADDRESS_MASK];
 
     // 🎨 Palette RAM
     /* TODO: IMPLEMENT */
@@ -40,8 +39,8 @@ export default class PPUMemory {
       return this.mapper.ppuWrite(address, value);
 
     
-    if((address & ADDRESS_MASK) == 0x2000)
-      return this.vram[VRAM_ADDRESS + address & VRAM_ADDRESS_MASK] = value;
+    if((address & ADDRESS_MASK) == VRAM_ADDRESS)
+      return this.vram[address & VRAM_ADDRESS_MASK] = value;
 
     // 🚽 Mirrors of $2000-$2EFF
     if (address >= 0x3000 && address <= 0x3eff)
