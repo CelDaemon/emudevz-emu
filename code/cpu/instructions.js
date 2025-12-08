@@ -1,6 +1,6 @@
 import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from '../bit';
-import { FLAG_BREAK } from 'CPU';
-import interrupts from '/lib/interrupts.js';
+import { FLAG_BREAK } from 'registers';
+import interrupts from '/lib/interrupts';
 
 function shiftLeft(cpu, value, carry) {
   console.assert(isByte(value), value);
