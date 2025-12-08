@@ -32,6 +32,10 @@ export default class PPU {
     this.frame = 0;
   }
 
+  onLoad(mapper) {
+    this.mapper = mapper;
+  }
+
   plot(x, y, color) {
     this.frameBuffer[y * FB_WIDTH + x] = this.registers.ppuMask.transform(color);
   }
@@ -83,7 +87,7 @@ export default class PPU {
       this.registers.ppuStatus.sprite0Hit = 0;
     }
     this.loopy.onPreLine(this.cycle);
-    
+    if(this.cycle == 260) this.mapper.tick();
   }
 
   _onVisibleLine() {
@@ -95,6 +99,7 @@ export default class PPU {
       return;
 
     this.loopy.onVisibleLine(this.cycle);
+    if(this.cycle == 260) this.mapper.tick();
   }
 
   _onVBlankLine(onInterrupt) {
