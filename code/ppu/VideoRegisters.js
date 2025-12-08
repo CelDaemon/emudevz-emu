@@ -19,11 +19,18 @@ class PPUCtrl extends InMemoryRegister.PPU {
 
 class PPUMask extends InMemoryRegister.PPU {
   onLoad() {
-    // TODO
+    this.addField("showBackgroundInFirst8Pixels", 1, 1)
+      .addField("showSpritesInFirst8Pixels", 2, 1)
+      .addField("showBackground", 3, 1)
+      .addField("showSprites", 4, 1);
   }
 
   onWrite(value) {
     this.setValue(value);
+  }
+
+  isRenderingEnabled() {
+    return this.showBackground || this.showSprites;
   }
 }
 

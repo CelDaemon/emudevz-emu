@@ -16,6 +16,8 @@ export default class SpriteRenderer {
   }
 
   renderScanline() {
+    if(!this.ppu.registers.ppuMask.showSprites)
+      return;
     const sprites = this._evaluate();
     this._render(sprites);
   }
@@ -45,14 +47,17 @@ export default class SpriteRenderer {
       const colorY = sprite.flipY ? 7 - tileY : tileY;
       const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileIdFor(offsetY), colorY);
       for(let offsetX = 0; offsetX < 8; offsetX++) {
+        const x = sprite.x + offsetX;
+        if(!this.ppu.registers.ppuMask.showSpritesInFirst8Pixels && x < 8)
+          continue;
         const colorX = sprite.flipX ? 7 - offsetX : offsetX;
         const colorIndex = tile.getColorIndex(colorX);
         if(colorIndex == 0)
           continue;
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);
-        const x = sprite.x + offsetX;
-        if(this.ppu.isBackgroundPixelOpaque(x, y)) {
-          if(sprite.id === 0)
+        
+        if(this.ppu.registers.ppuMask.showBackground && this.ppu.isBackgroundPixelOpaque(x, y)) {
+          if(sprite.id == 0)
             this.ppu.registers.ppuStatus.sprite0Hit = 1;
           if(!sprite.isInFrontOfBackground)
             continue;

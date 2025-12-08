@@ -70,6 +70,8 @@ export default class PPU {
   }
 
   _onPreLine() {
+    if(!this.registers.ppuMask.isRenderingEnabled())
+      return;
     if(this.cycle == 1) {
       this.registers.ppuStatus.isInVBlankInterval = 0;
       this.registers.ppuStatus.spriteOverflow = 0;
@@ -84,6 +86,8 @@ export default class PPU {
       this.backgroundRenderer.renderScanline();
       this.spriteRenderer.renderScanline();
     }
+    if(!this.registers.ppuMask.isRenderingEnabled())
+      return;
   }
 
   _onVBlankLine(onInterrupt) {
