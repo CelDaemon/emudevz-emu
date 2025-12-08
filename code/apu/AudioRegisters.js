@@ -1,4 +1,5 @@
 import InMemoryRegister from "/lib/InMemoryRegister";
+import noteLengths from '/lib/apu/noteLengths';
 
 class PulseControl extends InMemoryRegister.APU {
   onLoad() {
@@ -32,12 +33,15 @@ class PulseTimerLow extends InMemoryRegister.APU {
 
 class PulseTimerHighLCL extends InMemoryRegister.APU {
   onLoad() {
-    this.addField("timerHigh", 0, 3);
+    this.addField("timerHigh", 0, 3)
+      .addField("lengthCounterLoad", 3, 5);
   }
 
   onWrite(value) {
     this.setValue(value);
     this.apu.channels.pulses[this.id].updateTimer();
+    this.apu.channels.pulses[this.id].lengthCounter.counter = 
+      noteLengths[this.lengthCounterLoad];
   }
 }
 
@@ -146,6 +150,10 @@ class APUControl extends InMemoryRegister.APU {
 
   onWrite(value) {
     this.setValue(value);
+    if(!this.enablePulse1)
+      this.apu.channels.pulses[0].lengthCounter.reset();
+    if(!this.enablePulse2)
+      this.apu.channels.pulses[1].lengthCounter.reset();
   }
 }
 
