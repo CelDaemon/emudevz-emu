@@ -3,10 +3,12 @@ import BackgroundRenderer from 'BackgroundRenderer';
 import Tile from 'Tile';
 import VideoRegisters from 'VideoRegisters';
 import interrupts from '/lib/interrupts';
+import masterPalette from '/lib/ppu/masterPalette';
 
 
 const FB_WIDTH = 256;
 const FB_HEIGHT = 240;
+const PALETTE_RAM_ADDRESS = 0x3F00;
 
 export default class PPU {
   constructor(cpu) {
@@ -44,7 +46,14 @@ export default class PPU {
         onFrame(this.frameBuffer);
       }
     }
-   
+  }
+
+  getColor(paletteId, colorIndex) {
+    console.assert(paletteId >= 0 && paletteId <= 8, paletteId);
+    console.assert(colorIndex >= 0 && colorIndex <= 4, colorIndex);
+    const startAddress = PALETTE_RAM_ADDRESS + paletteId * 4;
+    const masterColorIndex = this.memory.read(startAddress + colorIndex);
+    return masterPalette[masterColorIndex];
   }
 
   _onPreLine() {
