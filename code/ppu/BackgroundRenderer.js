@@ -20,10 +20,17 @@ export default class BackgroundRenderer {
   }
 
   renderScanline() {
+    const transparentColor = this.ppu.getColor(0, 0);
+    
+    const y = this.ppu.scanline;
+
+    if(!this.ppu.registers.ppuMask.showBackground) {
+      for(let x = 0; x < FB_WIDTH; x++)
+        this.ppu.plotBG(x, y, transparentColor, 0);
+      return;
+    }
     const scrollX = this.ppu.registers.ppuScroll.x;
     const scrollY = this.ppu.registers.ppuScroll.y;
-
-    const y = this.ppu.scanline;
 
     const baseNameTableId = this.ppu.registers.ppuCtrl.nameTableId;
     const patternTableId = this.ppu.registers.ppuCtrl.backgroundPatternTableId;
@@ -34,8 +41,13 @@ export default class BackgroundRenderer {
     const tileY = Math.floor(nameTableY / TILE_SIZE);
     const tileOffsetY = nameTableY % TILE_SIZE;
 
-
-    for(let x = 0; x < FB_WIDTH;) {
+    let x = 0;
+    if(!this.ppu.registers.ppuMask.showBackgroundInFirst8Pixels) {
+      for(; x < 8; x++) {
+        this.ppu.plotBG(x, y, transparentColor, 0);
+      }
+    }
+    for(; x < FB_WIDTH;) {
       const scrolledX = x + scrollX;
       const nameTableX = scrolledX % FB_WIDTH;
       const tileX = Math.floor(nameTableX / TILE_SIZE);
@@ -62,7 +74,7 @@ export default class BackgroundRenderer {
       for(let tileOffsetX = 0; tileOffsetX < tilePixels; tileOffsetX++) {
         const colorIndex = tile.getColorIndex(tileStartOffsetX + tileOffsetX);
 
-        const color = colorIndex != 0 ? this.ppu.getColor(paletteId, colorIndex) : this.ppu.getColor(0, 0);
+        const color = colorIndex != 0 ? this.ppu.getColor(paletteId, colorIndex) : transparentColor;
 
         this.ppu.plotBG(x + tileOffsetX, y, color, colorIndex);
       }
