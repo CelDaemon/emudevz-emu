@@ -128,11 +128,12 @@ class DMCControl extends InMemoryRegister.APU {
 
 class DMCLoad extends InMemoryRegister.APU {
   onLoad() {
-    /* TODO: IMPLEMENT */
+    this.addField("directLoad", 0, 7);
   }
 
   onWrite(value) {
-    /* TODO: IMPLEMENT */
+    this.setValue(value);
+    this.apu.channels.dmc.outputSample = this.directLoad;
   }
 }
 

@@ -3,6 +3,7 @@ import PulseChannel from 'PulseChannel';
 import FrameSequencer from 'FrameSequencer';
 import TriangleChannel from 'TriangleChannel';
 import NoiseChannel from 'NoiseChannel';
+import DMCChannel from 'DMCChannel';
 
 export default class APU {
   constructor(cpu) {
@@ -16,6 +17,7 @@ export default class APU {
       ],
       triangle: new TriangleChannel(this, "enableTriangle"),
       noise: new NoiseChannel(this, "enableNoise"),
+      dmc: new DMCChannel(this, this.cpu)
     };
 
     this.frameSequencer = new FrameSequencer(this);
@@ -27,9 +29,10 @@ export default class APU {
   step(onSample) {
     for(const pulse of this.channels.pulses)
       pulse.step();
-    this.sampleCounter++;
     this.frameSequencer.step();
     this.channels.noise.step();
+    this.channels.dmc.step();
+    this.sampleCounter++;
     if(this.sampleCounter != 20)
       return;
     this.sampleCounter = 0;
@@ -37,8 +40,9 @@ export default class APU {
     const pulse2 = this.channels.pulses[1].sample();
     const triangle = this.channels.triangle.sample();
     const noise = this.channels.noise.sample();
-    this.sample = (pulse1 + pulse2 + triangle + noise) * 0.01;
-    onSample(this.sample, pulse1, pulse2, triangle, noise);
+    const dmc = this.channels.dmc.sample();
+    this.sample = (pulse1 + pulse2 + triangle + noise + dmc) * 0.01;
+    onSample(this.sample, pulse1, pulse2, triangle, noise, dmc);
   }
 
   onQuarterFrameClock() {
