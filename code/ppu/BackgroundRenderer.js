@@ -32,10 +32,9 @@ export default class BackgroundRenderer {
     const scrollX = this.ppu.registers.ppuScroll.x;
     const scrollY = this.ppu.registers.ppuScroll.y;
 
-    const baseNameTableId = this.ppu.registers.ppuCtrl.nameTableId;
     const patternTableId = this.ppu.registers.ppuCtrl.backgroundPatternTableId;
 
-    const scrolledY = y + scrollY;
+    const scrolledY = this.ppu.loopy.scrolledY(y);
     const nameTableY = scrolledY % FB_HEIGHT;
 
     const tileY = Math.floor(nameTableY / TILE_SIZE);
@@ -48,14 +47,12 @@ export default class BackgroundRenderer {
       }
     }
     for(; x < FB_WIDTH;) {
-      const scrolledX = x + scrollX;
+      const scrolledX = this.ppu.loopy.scrolledX(x);
       const nameTableX = scrolledX % FB_WIDTH;
       const tileX = Math.floor(nameTableX / TILE_SIZE);
       const tileStartOffsetX = nameTableX % TILE_SIZE;
 
-      const nameTableId = (baseNameTableId + 
-                           (scrolledX >= FB_WIDTH ? 1 : 0) + 
-                           (scrolledY >= FB_HEIGHT ? 2 : 0)) % 4;
+      const nameTableId = this.ppu.loopy.nameTableId(scrolledX);
 
       const nameTableAddress = NAME_TABLE_BASE + nameTableId * NAME_TABLE_SIZE;
 

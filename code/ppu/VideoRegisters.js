@@ -4,8 +4,7 @@ import { buildShort, getShortHighByte, toByte, toShort, isByte } from '../bit';
 
 class PPUCtrl extends InMemoryRegister.PPU {
   onLoad() {
-    this.addField("nameTableId", 0, 2)
-      .addField("vramAddressIncrement32", 2)
+    this.addField("vramAddressIncrement32", 2)
       .addField("sprite8x8PatternTableId", 3)
       .addField("backgroundPatternTableId", 4)
       .addField("spriteSize", 5)
@@ -14,6 +13,7 @@ class PPUCtrl extends InMemoryRegister.PPU {
 
   onWrite(value) {
     this.setValue(value);
+    this.ppu.loopy.onPPUCtrlWrite(value);
   }
 }
 
@@ -46,7 +46,7 @@ class PPUStatus extends InMemoryRegister.PPU {
   onRead() {
     const value = this.value;
     this.isInVBlankInterval = false;
-    this.ppu.registers.ppuAddr.latch = false;
+    this.ppu.loopy.onPPUStatusRead();
     return value;
   }
 }
@@ -71,35 +71,22 @@ class OAMData extends InMemoryRegister.PPU {
 }
 
 class PPUScroll extends InMemoryRegister.PPU {
-  onLoad() {
-    /* TODO: IMPLEMENT */
-    this.x = 0;
-    this.y = 0;
-  }
-
   onWrite(value) {
-    /* TODO: IMPLEMENT */
-    const ppuAddr = this.ppu.registers.ppuAddr;
-    if(!ppuAddr.latch)
-      this.x = value;
-    else
-      this.y = value;
-    ppuAddr.latch = !ppuAddr.latch;
+    this.ppu.loopy.onPPUScrollWrite(value);
   }
 }
 
 class PPUAddr extends InMemoryRegister.PPU {
-  onLoad() {
-    this.latch = false;
-    this.address = 0;
+  onWrite(value) {
+    this.ppu.loopy.onPPUAddrWrite(value);
   }
 
-  onWrite(value) {
-    if(this.latch)
-      this.address = buildShort(getShortHighByte(this.address), value);
-    else
-      this.address = buildShort(value, toByte(this.address));
-    this.latch = !this.latch;
+  get address() {
+    return this.ppu.loopy.vAddress.getValue();
+  }
+
+  set address(value) {
+    this.ppu.loopy.vAddress.setValue(value);
   }
 }
 
