@@ -33,7 +33,7 @@ export default class PPU {
   }
 
   plot(x, y, color) {
-    this.frameBuffer[y * FB_WIDTH + x] = color;
+    this.frameBuffer[y * FB_WIDTH + x] = this.registers.ppuMask.transform(color);
   }
 
   plotBG(x, y, color, colorIndex) {
