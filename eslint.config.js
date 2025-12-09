@@ -4,7 +4,7 @@ import globals from 'globals';
 
 export default defineConfig([
 	{
-        basePath: 'code',
+        basePath: 'src',
         ignores: ['tests/**/*'],
         plugins: {
             js,
