@@ -1,6 +1,6 @@
 import { isByte, isShort, toSignedByte, toByte, toShort, getShortHighByte, buildShort } from "../bit";
 
-const unsupported = () => { throw new Error("Unsupported.") };
+const unsupported = () => { throw new Error("Unsupported."); };
 function read(cpu, argument, hasPageCrossPenalty) {
   return cpu.memory.read(this.getAddress(cpu, argument, hasPageCrossPenalty));
 }
@@ -119,7 +119,7 @@ const addressingModes = {
   },
 };
 
-for (let key in addressingModes) {
+for (const key in addressingModes) {
   addressingModes[key].id = key;
 }
 

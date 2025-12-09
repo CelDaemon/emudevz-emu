@@ -1,6 +1,6 @@
 import InMemoryRegister from "/lib/InMemoryRegister";
 
-import { buildShort, getShortHighByte, toByte, toShort, isByte } from '../bit';
+import { buildShort, toByte, toShort } from '../bit';
 
 class PPUCtrl extends InMemoryRegister.PPU {
   onLoad() {
@@ -26,7 +26,7 @@ class PPUMask extends InMemoryRegister.PPU {
       .addField("showSprites", 4, 1)
       .addField("emphasizeRed", 5, 1)
       .addField("emphasizeGreen", 6, 1)
-      .addField("emphasizeBlue", 7, 1)
+      .addField("emphasizeBlue", 7, 1);
   }
 
   onWrite(value) {
