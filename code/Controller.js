@@ -1,4 +1,4 @@
-import { isByte, isFlagSet } from './bit.js';
+import { isByte, isFlagSet } from './bit';
 
 const BUTTONS = [
   "BUTTON_A",

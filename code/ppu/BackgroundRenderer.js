@@ -1,4 +1,4 @@
-import Tile from 'Tile';
+import Tile from './Tile';
 
 const NAME_TABLE_SIZE = 1024;
 const NAME_TABLE_BASE = 0x2000;

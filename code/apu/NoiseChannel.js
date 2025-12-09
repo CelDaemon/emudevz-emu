@@ -1,5 +1,5 @@
-import LengthCounter from 'LengthCounter';
-import VolumeEnvelope from 'VolumeEnvelope';
+import LengthCounter from './LengthCounter';
+import VolumeEnvelope from './VolumeEnvelope';
 import noisePeriods from '/lib/apu/noisePeriods';
 import byte from '/lib/byte';
 

@@ -1,5 +1,5 @@
-import LengthCounter from 'LengthCounter';
-import LinearLengthCounter from 'LinearLengthCounter';
+import LengthCounter from './LengthCounter';
+import LinearLengthCounter from './LinearLengthCounter';
 import TriangleOscillator from '/lib/apu/TriangleOscillator';
 import byte from '/lib/byte';
 

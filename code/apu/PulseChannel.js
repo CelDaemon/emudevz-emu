@@ -1,8 +1,8 @@
 import byte from "/lib/byte";
 import PulseOscillator from '/lib/apu/PulseOscillator';
-import LengthCounter from 'LengthCounter';
-import VolumeEnvelope from 'VolumeEnvelope';
-import FrequencySweep from 'FrequencySweep';
+import LengthCounter from './LengthCounter';
+import VolumeEnvelope from './VolumeEnvelope';
+import FrequencySweep from './FrequencySweep';
 
 const CPU_FREQ = 1789773;
 

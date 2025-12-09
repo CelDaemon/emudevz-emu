@@ -1,5 +1,5 @@
 import Sprite from '/lib/ppu/Sprite';
-import Tile from 'Tile';
+import Tile from './Tile';
 import byte from '/lib/byte';
 
 const SPRITE_SIZE = 4;
