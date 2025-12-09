@@ -45,11 +45,10 @@ export default class SpriteRenderer {
     const y = this.ppu.scanline;
     for(const sprite of sprites) {
       const offsetY = sprite.diffY(y);
-      const tileY = offsetY % TILE_SIZE
+      const tileY = offsetY % TILE_SIZE;
       const colorY = sprite.flipY ? 7 - tileY : tileY;
       const tile = new Tile(this.ppu, sprite.patternTableId, sprite.tileIdFor(offsetY), colorY);
       for(let offsetX = 0; offsetX < 8; offsetX++) {
-        // TODO fix sprite masking through priority quirk
         const x = sprite.x + offsetX;
         const attemptByteIndex = Math.floor(x / 8);
         const attemptBitIndex = x % 8;

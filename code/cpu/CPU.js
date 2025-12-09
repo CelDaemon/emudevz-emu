@@ -1,4 +1,4 @@
-import { isByteNegative, isByte, isShort, isFlagSet, buildShort, getFlagMask } from '../bit';
+import { isByte, isShort, buildShort, getFlagMask } from '../bit';
 import defineOperations from '/lib/cpu/defineOperations';
 import instructions from './instructions';
 import addressingModes from './addressingModes';
@@ -127,7 +127,7 @@ export default class CPU {
         operation,
         input,
         argument
-      )
+      );
     }
     operation.instruction.run(this, argument);
     return this._addCycles(operation);

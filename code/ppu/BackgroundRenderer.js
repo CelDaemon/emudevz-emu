@@ -29,8 +29,6 @@ export default class BackgroundRenderer {
         this.ppu.plotBG(x, y, transparentColor, 0);
       return;
     }
-    const scrollX = this.ppu.registers.ppuScroll.x;
-    const scrollY = this.ppu.registers.ppuScroll.y;
 
     const patternTableId = this.ppu.registers.ppuCtrl.backgroundPatternTableId;
 

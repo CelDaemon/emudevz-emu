@@ -1,7 +1,6 @@
 import PPUMemory from './PPUMemory';
 import BackgroundRenderer from './BackgroundRenderer';
 import SpriteRenderer from './SpriteRenderer';
-import Tile from './Tile';
 import VideoRegisters from './VideoRegisters';
 import LoopyRegister from '/lib/ppu/LoopyRegister';
 import interrupts from '/lib/interrupts';
