@@ -56,7 +56,6 @@ export class FlagsRegister {
   }
 
   getValue() {
-    let value = 0;
     return getFlagMask(FLAG_CARRY, this.c) |
       getFlagMask(FLAG_ZERO, this.z) |
       getFlagMask(FLAG_INTERRUPT, this.i) |
