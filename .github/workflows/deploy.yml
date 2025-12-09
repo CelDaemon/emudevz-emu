@@ -11,7 +11,7 @@ jobs:
         name: Checkout repository
       - run: npm ci
         name: Install dependencies
-      - run: npx vite build --base=/emudevz-emu
+      - run: npx vite build
         name: Build project
       - uses: actions/upload-pages-artifact@v4
         id: deployment
