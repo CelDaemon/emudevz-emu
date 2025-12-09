@@ -1,4 +1,4 @@
-import LengthCounter from 'LengthCounter';
+import LengthCounter from './LengthCounter';
 
 export default class LinearLengthCounter extends LengthCounter {
   constructor() {

@@ -1,5 +1,5 @@
 import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from '../bit';
-import { FLAG_BREAK } from 'registers';
+import { FLAG_BREAK } from './registers';
 import interrupts from '/lib/interrupts';
 
 function shiftLeft(cpu, value, carry) {

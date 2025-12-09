@@ -1,10 +1,9 @@
-
 import { isByteNegative, isByte, isShort, isFlagSet, buildShort, getFlagMask } from '../bit';
 import defineOperations from '/lib/cpu/defineOperations';
-import instructions from 'instructions';
-import addressingModes from 'addressingModes';
+import instructions from './instructions';
+import addressingModes from './addressingModes';
 
-import { FlagsRegister, Register8Bit, Register16Bit } from 'registers';
+import { FlagsRegister, Register8Bit, Register16Bit } from './registers';
 
 const STACK_ADDRESS = 0x0100;
 

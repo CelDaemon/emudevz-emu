@@ -1,9 +1,9 @@
-import AudioRegisters from 'AudioRegisters';
-import PulseChannel from 'PulseChannel';
-import FrameSequencer from 'FrameSequencer';
-import TriangleChannel from 'TriangleChannel';
-import NoiseChannel from 'NoiseChannel';
-import DMCChannel from 'DMCChannel';
+import AudioRegisters from './AudioRegisters';
+import PulseChannel from './PulseChannel';
+import FrameSequencer from './FrameSequencer';
+import TriangleChannel from './TriangleChannel';
+import NoiseChannel from './NoiseChannel';
+import DMCChannel from './DMCChannel';
 
 export default class APU {
   constructor(cpu) {
