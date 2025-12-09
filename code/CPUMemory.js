@@ -1,4 +1,4 @@
-import { isByte, isShort } from 'bit';
+import { isByte, isShort } from './bit';
 
 const WRAM_MASK = 0xE000;
 const WRAM_MEMORY_MASK = 0x7FF;
