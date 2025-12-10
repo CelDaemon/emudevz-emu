@@ -36,14 +36,14 @@ export class Register16Bit extends ArrayRegister {
   }
 }
 
-export const FLAG_CARRY = 0;
-export const FLAG_ZERO = 1;
-export const FLAG_INTERRUPT = 2;
-export const FLAG_DECIMAL = 3;
-export const FLAG_BREAK = 4;
-export const FLAG_UNUSED = 5;
-export const FLAG_OVERFLOW = 6;
-export const FLAG_NEGATIVE = 7;
+const FLAG_CARRY = 0;
+const FLAG_ZERO = 1;
+const FLAG_INTERRUPT = 2;
+const FLAG_DECIMAL = 3;
+const FLAG_BREAK = 4;
+const FLAG_UNUSED = 5;
+const FLAG_OVERFLOW = 6;
+const FLAG_NEGATIVE = 7;
 
 export class FlagsRegister {
   constructor() {
@@ -76,9 +76,13 @@ export class FlagsRegister {
     this.n = isFlagSet(value, FLAG_NEGATIVE);
   }
 
+  stackValue() {
+    return this.getValue() | getFlagMask(FLAG_BREAK, 1);
+  }
+
   updateZero(value) {
     console.assert(isByte(value), value);
-    this.z = value == 0;
+    this.z = value === 0;
   }
 
   updateNegative(value) {

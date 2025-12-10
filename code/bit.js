@@ -1,10 +1,10 @@
 export function isByteNegative(value) {
   console.assert(isByte(value), value);
-  return (value >> 7 & 1) != 0;
+  return (value >> 7 & 1) !== 0;
 }
 
 export function isFlagSet(value, flag) {
-  return (value >> flag & 1) != 0;
+  return (value >> flag & 1) !== 0;
 }
 
 export function getFlagMask(flag, state) {
@@ -40,13 +40,13 @@ export function toShort(value) {
 }
 
 export function isByte(value) {
-  return (value & ~BYTE_MASK) == 0;
+  return (value & ~BYTE_MASK) === 0;
 }
 
 export function isShort(value) {
-  return (value & ~SHORT_MASK) == 0;
+  return (value & ~SHORT_MASK) === 0;
 }
 
 export function isBit(value) {
-  return (value & ~1) == 0;
+  return (value & ~1) === 0;
 }

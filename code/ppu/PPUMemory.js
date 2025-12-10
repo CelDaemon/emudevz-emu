@@ -30,41 +30,41 @@ export default class PPUMemory {
   }
 
   read(address) {
-    if((address & ADDRESS_MASK) == 0)
+    if((address & ADDRESS_MASK) === 0)
       return this.mapper.ppuRead(address);
 
-    if((address & PALETTE_RAM_MASK) == PALETTE_RAM_ADDRESS) {
-      if((address & PALETTE_RAM_TRANSPARENT_MASK) == 0) 
+    if((address & PALETTE_RAM_MASK) === PALETTE_RAM_ADDRESS) {
+      if((address & PALETTE_RAM_TRANSPARENT_MASK) === 0) 
         return this.paletteRam[address & PALETTE_RAM_ADDRESS_TRANSPARENT_MASK];
       return this.paletteRam[address & PALETTE_RAM_ADDRESS_MASK];
     }
 
-    if((address & ADDRESS_MASK) == VRAM_ADDRESS) {
+    if((address & ADDRESS_MASK) === VRAM_ADDRESS) {
       const relativeAddress = address & VRAM_ADDRESS_MASK;
       const tablePhysicalAddress = this.getNameTablePhysicalAddress(relativeAddress);
       return this.vram[tablePhysicalAddress + (relativeAddress % VRAM_TABLE_SIZE)];
     }
 
-    console.warn("Unmapped read address: ", address.toString(16));
+    throw new RangeError(`Unmapped address: ${address.toString(16)}`);
   }
 
   write(address, value) {
-    if((address & ADDRESS_MASK) == 0)
+    if((address & ADDRESS_MASK) === 0)
       return this.mapper.ppuWrite(address, value);
 
-    if((address & PALETTE_RAM_MASK) == PALETTE_RAM_ADDRESS) {
-      if((address & PALETTE_RAM_TRANSPARENT_MASK) == 0) 
+    if((address & PALETTE_RAM_MASK) === PALETTE_RAM_ADDRESS) {
+      if((address & PALETTE_RAM_TRANSPARENT_MASK) === 0) 
         return this.paletteRam[address & PALETTE_RAM_ADDRESS_TRANSPARENT_MASK] = value;
       return this.paletteRam[address & PALETTE_RAM_ADDRESS_MASK] = value;
     }
     
-    if((address & ADDRESS_MASK) == VRAM_ADDRESS) {
+    if((address & ADDRESS_MASK) === VRAM_ADDRESS) {
       const relativeAddress = address & VRAM_ADDRESS_MASK;
       const tablePhysicalAddress = this.getNameTablePhysicalAddress(relativeAddress);
       return this.vram[tablePhysicalAddress + (relativeAddress % VRAM_TABLE_SIZE)] = value;
     }
 
-    console.warn("Unmapped write address: ", address.toString(16), "writing: ", value.toString(16));
+    throw new RangeError(`Unmapped address: ${address.toString(16)}`);
   }
 
   getNameTablePhysicalAddress(vramAddress) {
@@ -84,7 +84,7 @@ export default class PPUMemory {
   }
 
   changeNameTableMirroringTo(mirroringId) {
-    if(this.cartridge.header.mirroringId == "FOUR_SCREEN")
+    if(this.cartridge.header.mirroringId === "FOUR_SCREEN")
       mirroringId = "FOUR_SCREEN";
     this.mirroringId = mirroringId;
     this._mirroring = mirroringTypes[mirroringId];

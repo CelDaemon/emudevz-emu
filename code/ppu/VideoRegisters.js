@@ -137,7 +137,7 @@ class PPUData extends InMemoryRegister.PPU {
     let data = this.buffer;
     const address = this.ppu.registers.ppuAddr.address;
     this.buffer = this.ppu.memory.read(address);
-    if((address & PALETTE_RAM_MASK) == PALETTE_RAM_ADDRESS)
+    if((address & PALETTE_RAM_MASK) === PALETTE_RAM_ADDRESS)
       data = this.buffer;
     this._incrementAddress();
     return data;

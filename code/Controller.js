@@ -28,7 +28,7 @@ export default class Controller {
   }
 
   isStrobe() {
-    if(this._player == 1)
+    if(this._player === 1)
       return this.strobe;
     return this.other.strobe;
   }
