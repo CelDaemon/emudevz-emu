@@ -58,12 +58,12 @@ export default class SpriteRenderer {
           continue;
         const colorX = sprite.flipX ? 7 - offsetX : offsetX;
         const colorIndex = tile.getColorIndex(colorX);
-        if(colorIndex == 0)
+        if(colorIndex === 0)
           continue;
         attempts[attemptByteIndex] = byte.setBit(attempts[attemptByteIndex], attemptBitIndex, true);
         const color = this.ppu.getColor(sprite.paletteId, colorIndex);
         if(this.ppu.registers.ppuMask.showBackground && this.ppu.isBackgroundPixelOpaque(x, y)) {
-          if(sprite.id == 0)
+          if(sprite.id === 0)
             this.ppu.registers.ppuStatus.sprite0Hit = 1;
           if(!sprite.isInFrontOfBackground)
             continue;
@@ -83,7 +83,7 @@ export default class SpriteRenderer {
     const attributes = oamRam[address + SPRITE_ATTRIBUTES];
     const x = oamRam[address + SPRITE_X];
 
-    const isLarge = ppuCtrl.spriteSize == 1;
+    const isLarge = ppuCtrl.spriteSize === 1;
 
     const tileId = oamRam[address + SPRITE_TILE_ID] & 
       (isLarge ? 0xFE : 0xFF);
@@ -91,6 +91,6 @@ export default class SpriteRenderer {
     const patternTableId = 
       isLarge ? oamRam[address + SPRITE_TILE_ID] & 0x1 : ppuCtrl.sprite8x8PatternTableId;
     
-    return new Sprite(id, x, y, this.ppu.registers.ppuCtrl.spriteSize == 1, patternTableId, tileId, attributes);
+    return new Sprite(id, x, y, this.ppu.registers.ppuCtrl.spriteSize === 1, patternTableId, tileId, attributes);
   }
 }

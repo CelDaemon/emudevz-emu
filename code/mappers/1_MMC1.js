@@ -15,7 +15,6 @@ function getMirroringId(value) {
       throw new RangeError(`Unknown mirroring id: ${value}`);
   }
 }
-// HIIHI
 export default class MMC1 extends Mapper {
   onLoad() {
     this.control = 0;
@@ -33,15 +32,15 @@ export default class MMC1 extends Mapper {
       return (this.prgBank & ~0x1) + isHigh;
     
     if(!isHigh) 
-      return bankMode == 2 ? 0 : this.prgBank;
+      return bankMode === 2 ? 0 : this.prgBank;
     else
-      return bankMode == 3 ? this.prgPages.length - 1 : this.prgBank;
+      return bankMode === 3 ? this.prgPages.length - 1 : this.prgBank;
   }
   
   _chrPage(isHigh) {
     const bankMode = byte.getBit(this.control, 4);
 
-    if(bankMode == 0) {
+    if(bankMode === 0) {
       const ret = (this.chrBank0 & ~0x1) + isHigh;
       return ret;
     }
@@ -84,7 +83,7 @@ export default class MMC1 extends Mapper {
     if(this.cartridge.header.hasPrgRam && address >= 0x6000 && address <= 0x7FFF) {
       return this.prgRam[address - 0x6000];
     } else if(address >= 0x8000 && address <= 0xBFFF) {
-      return this.$getPrgPage(this._prgPage(false))[address - 0x8000]; // TODO switching banks
+      return this.$getPrgPage(this._prgPage(false))[address - 0x8000];
     } else if(address >= 0xC000 && address <= 0xFFFF) {
       return this.$getPrgPage(this._prgPage(true))[address - 0xC000];
     }
@@ -100,7 +99,7 @@ export default class MMC1 extends Mapper {
         this._reset();
         return;
       }
-      if(this.loadWriteCounter != 5)
+      if(this.loadWriteCounter !== 5)
         return;
       this._registerWrite(address, this.loadShiftRegister);
       this._resetShift();

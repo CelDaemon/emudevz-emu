@@ -47,15 +47,15 @@ export default class PPU {
   }
 
   isBackgroundPixelOpaque(x, y) {
-    return this.colorIndexes[y * FB_WIDTH + x] != 0;
+    return this.colorIndexes[y * FB_WIDTH + x] !== 0;
   }
   
   step(onFrame, onInterrupt) {
-    if(this.scanline == -1)
+    if(this.scanline === -1)
       this._onPreLine();
     else if(this.scanline < FB_HEIGHT)
       this._onVisibleLine();
-    else if(this.scanline == FB_HEIGHT + 1)
+    else if(this.scanline === FB_HEIGHT + 1)
       this._onVBlankLine(onInterrupt);
     this.cycle++;
     if(this.cycle >= FB_WIDTH + 85) {
@@ -80,17 +80,17 @@ export default class PPU {
   _onPreLine() {
     if(!this.registers.ppuMask.isRenderingEnabled())
       return;
-    if(this.cycle == 1) {
+    if(this.cycle === 1) {
       this.registers.ppuStatus.isInVBlankInterval = 0;
       this.registers.ppuStatus.spriteOverflow = 0;
       this.registers.ppuStatus.sprite0Hit = 0;
     }
     this.loopy.onPreLine(this.cycle);
-    if(this.cycle == 260) this.mapper.tick();
+    if(this.cycle === 260) this.mapper.tick();
   }
 
   _onVisibleLine() {
-    if(this.cycle == 0) {
+    if(this.cycle === 0) {
       this.backgroundRenderer.renderScanline();
       this.spriteRenderer.renderScanline();
     }
@@ -98,11 +98,11 @@ export default class PPU {
       return;
 
     this.loopy.onVisibleLine(this.cycle);
-    if(this.cycle == 260) this.mapper.tick();
+    if(this.cycle === 260) this.mapper.tick();
   }
 
   _onVBlankLine(onInterrupt) {
-    if(this.cycle == 1) {
+    if(this.cycle === 1) {
       this.registers.ppuStatus.isInVBlankInterval = 1;
       if(this.registers.ppuCtrl.generateNMIOnVBlank)
         onInterrupt(interrupts.NMI);
