@@ -1,5 +1,4 @@
 import { isByteNegative, toByte, isBit, isByte, isShort, isFlagSet, getFlagMask } from '../bit';
-import { FLAG_BREAK } from './registers';
 import interrupts from '/lib/interrupts';
 
 function shiftLeft(cpu, value, carry) {
@@ -48,7 +47,7 @@ const instructions = {
       cpu.flags.updateZeroAndNegative(newValue);
       cpu.flags.c = !isByte(result);
       const addendNegative = isByteNegative(addend);
-      cpu.flags.v = addendNegative == isByteNegative(oldValue) && addendNegative != isByteNegative(newValue);
+      cpu.flags.v = addendNegative === isByteNegative(oldValue) && addendNegative !== isByteNegative(newValue);
     }
   },
   ASL: {
@@ -197,7 +196,7 @@ const instructions = {
   PHP: {
     argument: 'no',
     run(cpu) {
-      cpu.stack.push(cpu.flags.getValue() | getFlagMask(FLAG_BREAK, true));
+      cpu.stack.push(cpu.flags.stackValue());
     }
   },
   PLA: {
@@ -307,7 +306,7 @@ const instructions = {
       const value = cpu.a.getValue();
       cpu.flags.n = isFlagSet(mask, 7);
       cpu.flags.v = isFlagSet(mask, 6);
-      cpu.flags.z = (value & mask) == 0;
+      cpu.flags.z = (value & mask) === 0;
     }
   },
   CMP: {

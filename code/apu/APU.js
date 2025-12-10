@@ -33,7 +33,7 @@ export default class APU {
     this.channels.noise.step();
     this.channels.dmc.step();
     this.sampleCounter++;
-    if(this.sampleCounter != 20)
+    if(this.sampleCounter !== 20)
       return;
     this.sampleCounter = 0;
     const pulse1 = this.channels.pulses[0].sample();

@@ -14,21 +14,23 @@ export default class CPUMemory {
 
   read(address) {
     console.assert(isShort(address), address);
-    if(address < 0)
-      throw new Error("Invalid Address");
-    if((address & WRAM_MASK) == 0)
+
+    if((address & WRAM_MASK) === 0)
       return this.ram[address & WRAM_MEMORY_MASK];
 
-    if((address & ~0x1) == CONTROLLER_ADDRESS)
+    if((address & ~0x1) === CONTROLLER_ADDRESS)
       return this.controllers[address & 0x1].onRead();
 
-    if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
+    if((address >= 0x2000 && address <= 0x2007) || address === 0x4014)
       return this.ppu.registers.read(address);
 
-    if((address >= 0x4000 && address <= 0x4013) || address == 0x4015)
+    if((address >= 0x4000 && address <= 0x4013) || address === 0x4015)
       return this.apu.registers.read(address);
-    
-    return this.mapper.cpuRead(address);
+
+    if(address >= 0x4020 && address <= 0xFFFF)
+      return this.mapper.cpuRead(address);
+
+    throw new Error(`Unmapped address: ${address.toString(16)}`);
   }
 
   read16(address) {
@@ -39,25 +41,24 @@ export default class CPUMemory {
   write(address, value) {
     console.assert(isShort(address), address);
     console.assert(isByte(value), value);
-    if(address < 0)
-      throw new Error("Invalid Address");
-    
-    if((address & WRAM_MASK) == 0)
+
+    if((address & WRAM_MASK) === 0)
       return this.ram[address & WRAM_MEMORY_MASK] = value;
     
-    if(address == CONTROLLER_ADDRESS)
+    if(address === CONTROLLER_ADDRESS)
       return this.controllers[0].onWrite(value);
 
 
-    if((address >= 0x2000 && address <= 0x2007) || address == 0x4014)
+    if((address >= 0x2000 && address <= 0x2007) || address === 0x4014)
       return this.ppu.registers.write(address, value);
 
-    if((address >= 0x4000 && address <= 0x4013) || address == 0x4015 || address == 0x4017)
+    if((address >= 0x4000 && address <= 0x4013) || address === 0x4015 || address === 0x4017)
       return this.apu.registers.write(address, value);
 
-    
-    
-    return this.mapper.cpuWrite(address, value);
+    if(address >= 0x4020 && address <= 0xFFFF)
+      return this.mapper.cpuWrite(address, value);
+
+    throw new Error(`Unmapped address: ${address.toString(16)}`);
   }
 
   onLoad(ppu, apu, mapper, controllers) {

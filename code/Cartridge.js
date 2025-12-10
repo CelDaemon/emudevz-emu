@@ -22,9 +22,9 @@ const PRG_PAGE_SIZE = 16384;
 const CHR_PAGE_SIZE = 8192;
 
 function getMirroringId(flags) {
-  if((flags & FLAG_FOUR_SCREEN) != 0)
+  if((flags & FLAG_FOUR_SCREEN) !== 0)
     return MIRRORING_FOUR_SCREEN;
-  if((flags & FLAG_MIRRORING_VERTICAL) != 0)
+  if((flags & FLAG_MIRRORING_VERTICAL) !== 0)
     return MIRRORING_VERTICAL;
   return MIRRORING_HORIZONTAL;
 }
@@ -57,8 +57,8 @@ export default class Cartridge {
     
     const flags = bytes[FLAGS_OFFSET];
     
-    const has512BytePadding = (flags & FLAG_PADDING) != 0;
-    const hasPrgRam = (flags & FLAG_PRG_RAM) != 0;
+    const has512BytePadding = (flags & FLAG_PADDING) !== 0;
+    const hasPrgRam = (flags & FLAG_PRG_RAM) !== 0;
     const mirroringId = getMirroringId(flags);
     
     const mapperId = bytes[MAPPER_UPPER_OFFSET] & 0b11110000 |

@@ -69,7 +69,7 @@ export default class BackgroundRenderer {
       for(let tileOffsetX = 0; tileOffsetX < tilePixels; tileOffsetX++) {
         const colorIndex = tile.getColorIndex(tileStartOffsetX + tileOffsetX);
 
-        const color = colorIndex != 0 ? this.ppu.getColor(paletteId, colorIndex) : transparentColor;
+        const color = colorIndex !== 0 ? this.ppu.getColor(paletteId, colorIndex) : transparentColor;
 
         this.ppu.plotBG(x + tileOffsetX, y, color, colorIndex);
       }
@@ -86,8 +86,11 @@ export default class BackgroundRenderer {
 
     const attributeX = Math.floor((tileX % META_BLOCK_SIZE) / ATTRIBUTE_BLOCK_SIZE);
     const attributeY = Math.floor((tileY % META_BLOCK_SIZE) / ATTRIBUTE_BLOCK_SIZE);
+
+    console.assert(attributeX >= 0 && attributeX <= 1, attributeX);
+    console.assert(attributeY >= 0 && attributeY <= 1, attributeY);
     
-    const offset = ((attributeX == 1 ? 1 : 0) + (attributeY == 1 ? 2 : 0)) * 2;
+    const offset = (attributeX + attributeY * 2) * 2;
     return (attributes >> offset) & 0b11;
   }
 }

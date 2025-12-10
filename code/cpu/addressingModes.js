@@ -35,7 +35,7 @@ const addressingModes = {
     getAddress: (cpu, offset, hasPageCrossPenalty) => {
       const pc = cpu.pc.getValue();
       const output = toShort(pc + toSignedByte(toByte(offset)));
-      if(hasPageCrossPenalty && getShortHighByte(pc) != getShortHighByte(output))
+      if(hasPageCrossPenalty && getShortHighByte(pc) !== getShortHighByte(output))
         cpu.extraCycles += 2;
       return output;
     },
@@ -76,7 +76,7 @@ const addressingModes = {
     getAddress: (cpu, absoluteAddress, hasPageCrossPenalty) => {
       console.assert(isShort(absoluteAddress), absoluteAddress);
       const output = toShort(absoluteAddress + cpu.x.getValue());
-      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) != getShortHighByte(output))
+      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) !== getShortHighByte(output))
         cpu.extraCycles += 1;
       return output;
     },
@@ -88,7 +88,7 @@ const addressingModes = {
     getAddress: (cpu, absoluteAddress, hasPageCrossPenalty) => {
       console.assert(isShort(absoluteAddress), absoluteAddress);
       const output = toShort(absoluteAddress + cpu.y.getValue());
-      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) != getShortHighByte(output))
+      if(hasPageCrossPenalty && getShortHighByte(absoluteAddress) !== getShortHighByte(output))
         cpu.extraCycles += 1;
       return output;
     },
@@ -111,7 +111,7 @@ const addressingModes = {
       console.assert(isByte(zeroPageAddress), zeroPageAddress);
       const base = buildShort(cpu.memory.read(toByte(zeroPageAddress + 1)), cpu.memory.read(zeroPageAddress));
       const output = toShort(base + cpu.y.getValue());
-      if(hasPageCrossPenalty && getShortHighByte(base) != getShortHighByte(output))
+      if(hasPageCrossPenalty && getShortHighByte(base) !== getShortHighByte(output))
         cpu.extraCycles += 1;
       return output;
     },

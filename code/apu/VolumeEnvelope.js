@@ -18,7 +18,7 @@ export default class VolumeEnvelope {
     }
 
     this.dividerCount = period;
-    if(this.volume != 0) {
+    if(this.volume !== 0) {
       this.volume--;
       return;
     }
