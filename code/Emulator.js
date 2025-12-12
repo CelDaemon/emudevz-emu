@@ -3,14 +3,155 @@ import Cartridge from "./Cartridge";
 import Controller from "./Controller";
 import APU from "./apu/APU";
 import CPU from "./cpu/CPU";
-import mappers from "./mappers/mappers";
+import { createMapper } from "./mappers/mappers";
 import PPU from "./ppu/PPU";
 import saveStates from "./saveStates";
 
 const PPU_STEPS_PER_CPU_CYCLE = 3;
 const APU_STEPS_PER_CPU_CYCLE = 0.5;
 
+/** @import Mapper from '/lib/Mapper' */
+
+/**
+ * A callback containing a drawn frame.
+ *
+ * @callback FrameCallback
+ *
+ * @param {Uint32Array} framebuffer The newly drawn frame.
+ *
+ * @returns {void}
+ */
+
+/**
+ * A callback containing a generated sample.
+ *
+ * @callback SampleCallback
+ *
+ * @param {number} sample The final mixed sample.
+ * @param {number} pulse1 Sample from the 1st pulse channel.
+ * @param {number} pulse2 Sample from the 2nd pulse channel.
+ * @param {number} triangle Sample from the triangle channel.
+ * @param {number} noise Sample from the noise channel.
+ * @param {number} dmc Sample from the DMC channel.
+ *
+ * @returns {void}
+ */
+
+// TODO: Better type the InterruptCallback
+
+/**
+ * A callback to trigger a CPU interrupt.
+ *
+ * @callback InterruptCallback
+ *
+ * @param {object} interrupt The interrupt to trigger.
+ * 
+ * @returns {void}
+ */
+
+/**
+ * @typedef {object} EmulatorContext
+ *
+ * @prop {Cartridge} cartridge The currently loaded cartridge.
+ * @prop {Mapper} mapper The currently active mapper.
+ * @prop {[controller1: Controller, controller2: Controller]}
+ *     controllers The active controllers.
+ */
+
+/** @typedef {'BUTTON_LEFT'   |
+ *            'BUTTON_RIGHT'  |
+ *            'BUTTON_UP'     |
+ *            'BUTTON_DOWN'   |
+ *            'BUTTON_A'      |
+ *            'BUTTON_B'      |
+ *            'BUTTON_X'      |
+ *            'BUTTON_Y'      |
+ *            'BUTTON_L'      |
+ *            'BUTTON_R'      |
+ *            'BUTTON_START'  |
+ *            'BUTTON_SELECT'
+ *            } Button
+ */
+
 export default class Emulator {
+
+  /**
+   * A callback that is executed when a new frame has finished drawing.
+   *
+   * @type {FrameCallback}
+   */
+  onFrame;
+
+  /**
+   * A callback that is executed when a new sample is generated.
+   *
+   * @type {SampleCallback}
+   */
+  onSample;
+
+  /**
+   * The CPU memory bus.
+   *
+   * @type {CPUMemory}
+   */
+  cpuMemory;
+
+  /**
+   * The central processing unit.
+   *
+   * @type {CPU}
+   */
+  cpu;
+
+  /**
+   * The pixel processing unit.
+   *
+   * @type {PPU}
+   */
+  ppu;
+
+  /**
+   * The audio processing unit.
+   *
+   * @type {APU}
+   */
+  apu;
+
+  /**
+   * The current sample count.
+   *
+   * @type {number}
+   */
+  sampleCount;
+
+  /**
+   * Amount of extra cycles to run the next time the PPU is clocked.
+   */
+  pendingPPUCycles;
+
+  /**
+   * Amount of extra cycles to run the next time the APU is clocked.
+   */
+  pendingAPUCycles;
+
+  /**
+   * Callback that is executed when a scanline is processed.
+   * 
+   * @type {?() => void}
+   */
+  onScanline;
+
+  /**
+   * The currently active context.
+   *
+   * @type {?EmulatorContext}
+   */
+  context;
+
+  /**
+   * @param {FrameCallback} onFrame
+   * @param {SampleCallback} onSample
+   */
   constructor(onFrame, onSample) {
     this.onFrame = onFrame;
     this.onSample = (sample, pulse1, pulse2, triangle, noise, dmc) => {
@@ -28,21 +169,27 @@ export default class Emulator {
     this.pendingAPUCycles = 0;
 
     this.onScanline = null;
+
+    this.context = null;
   }
 
   /**
    * Loads a ROM file.
-   * `bytes`: `Uint8Array`
-   * `saveFileBytes`: `Uint8Array` or null
+   *
+   * @param {Uint8Array} bytes The raw ROM data.
+   * @param {?Uint8Array} saveFileBytes The raw save file data.
+   *
+   * @returns {void}
    */
   load(bytes, saveFileBytes = null) {
     const cartridge = new Cartridge(bytes);
-    const mapper = mappers.create(this.cpu, this.ppu, cartridge);
+    const mapper = createMapper(this.cpu, this.ppu, cartridge);
 
     const controller1 = new Controller(1);
     const controller2 = new Controller(2);
     controller1.other = controller2;
     controller2.other = controller1;
+    /** @type {[Controller, Controller]} */
     const controllers = [controller1, controller2];
 
     this.cpu.memory.onLoad(this.ppu, this.apu, mapper, controllers);
@@ -65,11 +212,15 @@ export default class Emulator {
     this._setSaveFile(saveFileBytes);
   }
 
+
   /**
    * Updates a button's state.
-   * `playerId`: `1` or `2`
-   * `button`: One of "BUTTON_LEFT", "BUTTON_RIGHT", "BUTTON_UP", "BUTTON_DOWN", "BUTTON_A", "BUTTON_B", "BUTTON_X", "BUTTON_Y", "BUTTON_L", "BUTTON_R", "BUTTON_START", "BUTTON_SELECT"
-   * `isPressed`: `boolean`
+   *
+   * @param {1 | 2} playerId The player to update the button for.
+   * @param {Button} button The button to update.
+   * @param {boolean} isPressed Whether the button is pressed.
+   *
+   * @returns {void}
    */
   setButton(playerId, button, isPressed) {
     if (!this.context) return;
@@ -82,6 +233,8 @@ export default class Emulator {
   /**
    * Runs the emulation for a whole frame.
    * Used when "SYNC TO VIDEO" is active.
+   *
+   * @returns {void}
    */
   frame() {
     if (!this.context) return;
@@ -95,7 +248,10 @@ export default class Emulator {
   /**
    * Runs the emulation for `n` audio samples.
    * Used when "SYNC TO AUDIO" is active.
-   * `n`: `number`
+   *
+   * @param {number} n The amount of samples to run for.
+   *
+   * @returns {void}
    */
   samples(n) {
     if (!this.context) return;
@@ -106,7 +262,13 @@ export default class Emulator {
     }
   }
 
-  /** Runs the emulation until the next scanline. */
+  /** 
+   * Runs the emulation until the next scanline.
+   *
+   * @param {boolean} [debug] Whether to draw the scanline marker.
+   *
+   * @returns {void}
+   */
   scanline(debug = false) {
     if (!this.context) return;
 
@@ -117,9 +279,7 @@ export default class Emulator {
 
     let oldFrameBuffer;
     if (debug) {
-      oldFrameBuffer = new Uint32Array(this.ppu.frameBuffer.length);
-      for (let i = 0; i < this.ppu.frameBuffer.length; i++)
-        oldFrameBuffer[i] = this.ppu.frameBuffer[i];
+      oldFrameBuffer = Uint32Array.from(this.ppu.frameBuffer);
 
       // plot red line
       for (let i = 0; i < 256; i++)
@@ -129,12 +289,16 @@ export default class Emulator {
     this.onFrame(this.ppu.frameBuffer);
 
     if (debug) {
-      for (let i = 0; i < this.ppu.frameBuffer.length; i++)
-        this.ppu.frameBuffer[i] = oldFrameBuffer[i];
+      this.ppu.frameBuffer.set(
+        /** @type {NonNullable<typeof oldFrameBuffer>} */ (oldFrameBuffer), 0);
     }
   }
 
-  /** Executes a step in the emulation (1 CPU instruction). */
+  /** 
+   * Executes a step in the emulation (1 CPU instruction).
+   *
+   * @returns {void}
+   */
   step() {
     let cpuCycles = this.cpu.step();
     cpuCycles = this._clockPPU(cpuCycles);
@@ -142,43 +306,60 @@ export default class Emulator {
   }
 
   /**
-   * Returns an array with the save file bytes, or null if the game doesn't have a save file.
+   * Returns an array with the save file bytes,
+   * or null if the game doesn't have a save file.
+   *
+   * @returns {?number[]}
    */
   getSaveFile() {
-    if (!this.context) return;
-    const { prgRam } = this.context.mapper;
+    if (!this.context) return null;
+    const { prgRam } = 
+      /** @type {typeof this.context.mapper & { prgRam: ?Uint8Array }} */
+      (this.context.mapper);
     if (!prgRam) return null;
 
-    const bytes = [];
-    for (let i = 0; i < prgRam.length; i++) {
-      bytes[i] = prgRam[i];
-    }
-
-    return bytes;
+    return Array.from(prgRam);
   }
 
-    /**
+
+   /**
    * Returns an object with a snapshot of the current state.
+   *
+   * @returns {?object} The created snapshot.
    */
   getSaveState() {
-    if (!this.context) return;
+    if (!this.context) return null;
 
     return saveStates.getSaveState(this);
   }
 
-  /*
+  // TODO: Further type the save state.
+
+  /**
    * Restores the current state from a snapshot.
-   * `saveState`: the object returned by `getSaveState()`
+   *
+   * @param {object} saveState The snapshot to load.
+   *
+   * @returns {void}
    */
-  setSaveState(_saveState) {
+  setSaveState(saveState) {
     if (!this.context) return;
 
-    const saveState = JSON.parse(JSON.stringify(_saveState)); // deep copy
+    
+    // TODO: Improve save state typing.
+    const clonedSaveState = /** @type { { saveFile: ?Uint8Array } } */ (structuredClone(saveState));
 
-    saveStates.setSaveState(this, saveState);
-    this._setSaveFile(saveState.saveFile);
+    saveStates.setSaveState(this, clonedSaveState);
+    this._setSaveFile(clonedSaveState.saveFile);
   }
 
+  /**
+   * Clock the PPU for a specific amount of CPU cycles.
+   *
+   * @param {number} cpuCycles The amount of CPU cycles to run for.
+   *
+   * @returns {number} The number of CPU cycles that were ran.
+   */
   _clockPPU(cpuCycles) {
     const scanline = this.ppu.scanline;
 
@@ -186,6 +367,7 @@ export default class Emulator {
       this.pendingPPUCycles + cpuCycles * PPU_STEPS_PER_CPU_CYCLE;
     this.pendingPPUCycles = 0;
 
+    /** @type {InterruptCallback} */
     const onIntr = (interrupt) => {
       const newCPUCycles = this.cpu.interrupt(interrupt);
       cpuCycles += newCPUCycles;
@@ -213,30 +395,48 @@ export default class Emulator {
     return cpuCycles;
   }
 
+  /**
+   * Clock the APU for a specific amount of CPU cycles.
+   *
+   * @param {number} cpuCycles The amount of CPU cycles to run for.
+   *
+   * @returns {void}
+   */
   _clockAPU(cpuCycles) {
     let unitCycles =
       this.pendingAPUCycles + cpuCycles * APU_STEPS_PER_CPU_CYCLE;
 
-    const onIntr = (interrupt) => {
-      const newCPUCycles = this.cpu.interrupt(interrupt);
-      unitCycles += newCPUCycles * APU_STEPS_PER_CPU_CYCLE;
-      this.pendingPPUCycles += newCPUCycles * PPU_STEPS_PER_CPU_CYCLE;
-    };
+    // /** @type {InterruptCallback} */
+    // const onIntr = (interrupt) => {
+    //   const newCPUCycles = this.cpu.interrupt(interrupt);
+    //   unitCycles += newCPUCycles * APU_STEPS_PER_CPU_CYCLE;
+    //   this.pendingPPUCycles += newCPUCycles * PPU_STEPS_PER_CPU_CYCLE;
+    // };
 
     while (unitCycles >= 1) {
-      this.apu.step(this.onSample, onIntr);
+      // TODO: Implement APU IRQ.
+      this.apu.step(this.onSample); // onIntr;
       unitCycles--;
     }
 
     this.pendingAPUCycles = unitCycles;
   }
 
+  /**
+   * Load save data into PRG RAM.
+   *
+   * @param {?Uint8Array} prgRamBytes The save file data to load.
+   *
+   * @returns {void}
+   */
   _setSaveFile(prgRamBytes) {
-    const prgRam = this.context.mapper.prgRam;
+    if (!this.context) 
+      return;
+    const { prgRam } = 
+      /** @type {typeof this.context.mapper & { prgRam: ?Uint8Array }} */
+      (this.context.mapper);
     if (!prgRam || !prgRamBytes) return;
 
-    for (let i = 0; i < prgRamBytes.length; i++) {
-      prgRam[i] = prgRamBytes[i];
-    }
+    prgRam.set(prgRamBytes, 0);
   }
 }
