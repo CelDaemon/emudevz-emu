@@ -13,7 +13,9 @@ export default defineConfig([
 		rules: {
 			semi: 'error',
 			'prefer-const': 'error',
-            eqeqeq: ['error', 'smart']
+            eqeqeq: ['error', 'smart'],
+            'block-scoped-var': 'error',
+            'consistent-return': 'error',
 		},
         languageOptions: {
             globals: {
