@@ -7,6 +7,12 @@ import interrupts from '/lib/interrupts';
 import masterPalette from '/lib/ppu/masterPalette';
 
 
+/**
+ * A mirroring id, used for deciding how to mirror PPU banks.
+ *
+ * @typedef {'VERTICAL' | 'HORIZONTAL' | 'FOUR_SCREEN' | 'ONE_SCREEN_LOWER_BANK' | 'ONE_SCREEN_UPPER_BANK'} MirroringId
+ */
+
 const FB_WIDTH = 256;
 const FB_HEIGHT = 240;
 const PALETTE_RAM_ADDRESS = 0x3F00;

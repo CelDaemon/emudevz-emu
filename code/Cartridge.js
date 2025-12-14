@@ -14,34 +14,84 @@ const FLAG_PRG_RAM = 0b10;
 const FLAG_MIRRORING_VERTICAL = 0b1;
 
 
-const MIRRORING_VERTICAL = "VERTICAL";
-const MIRRORING_HORIZONTAL = "HORIZONTAL";
-const MIRRORING_FOUR_SCREEN = "FOUR_SCREEN";
-
 const PRG_PAGE_SIZE = 16384;
 const CHR_PAGE_SIZE = 8192;
 
+/**
+ * @import { MirroringId } from './ppu/PPU'
+ * @import { MapperId } from './mappers/mappers'
+ */
+
+/**
+ * Get the mirroring id based on flags.
+ *
+ * @param {number} flags The flags to get the mirroring type from.
+ *
+ * @returns {MirroringId} The mirroring id.
+ */
 function getMirroringId(flags) {
   if((flags & FLAG_FOUR_SCREEN) !== 0)
-    return MIRRORING_FOUR_SCREEN;
+    return 'FOUR_SCREEN';
   if((flags & FLAG_MIRRORING_VERTICAL) !== 0)
-    return MIRRORING_VERTICAL;
-  return MIRRORING_HORIZONTAL;
+    return 'VERTICAL';
+  return 'HORIZONTAL';
 }
 
-function getPrgOffset(header) {
-  return HEADER_SIZE + (header.has512BytePadding ? 512 : 0);
+
+/**
+ * Get the PRG ROM start offset.
+ *
+ * @param {boolean} hasPadding Whether the cartridge has a 512 byte padding.
+ */
+function getPrgOffset(hasPadding) {
+  return HEADER_SIZE + (hasPadding ? 512 : 0);
 }
 
-function getPrgSize(header) {
-  return header.prgRomPages * PRG_PAGE_SIZE;
+
+/**
+ * Get the size of the PRG ROM.
+ *
+ * @param {number} pages The amount of PRG pages.
+ *
+ * @returns {number} The size of the PRG ROM.
+ */
+function getPrgSize(pages) {
+  return pages * PRG_PAGE_SIZE;
 }
 
-function getChrOffset(header) {
-  return getPrgOffset(header) + getPrgSize(header);
-}
+/**
+ * A header of a cartridge containing metadata.
+ *
+ * @typedef {object} CartridgeHeader
+ *
+ * @prop {number} prgRomPages The amount of PRG ROM pages.
+ * @prop {number} chrRomPages The amount of CHR ROM pages.
+ * @prop {boolean} usesChrRam Whether the cartridge CHR memory is writable.
+ * @prop {boolean} has512BytePadding Whether the cartrige has a 512 byte padding.
+ * @prop {boolean} hasPrgRam Whether the cartridge PRG memory is writable.
+ * @prop {MirroringId} mirroringId The type of PPU mirroring the cartridge uses.
+ * @prop {number} mapperId The id of the mapper the cartridge uses.
+ */
 
 export default class Cartridge {
+
+  /**
+   * The header of this cartridge.
+   *
+   * @type {CartridgeHeader}
+   */
+  header;
+
+  /**
+   * The raw cartridge data.
+   *
+   * @type {Uint8Array}
+   */
+  bytes;
+
+  /**
+   * @param {Uint8Array} bytes The raw cartridge data.
+   */
   constructor(bytes) {
     if(bytes[0] !== MAGIC.charCodeAt(0) ||
        bytes[1] !== MAGIC.charCodeAt(1) ||
@@ -75,15 +125,25 @@ export default class Cartridge {
     };
   }
 
+  /**
+   * Get the PRG data for this cartridge.
+   *
+   * @returns {Uint8Array} The PRG memory as a byte array.
+   */
   prg() {
-    const offset = getPrgOffset(this.header);
-    return this.bytes.slice(offset, offset + getPrgSize(this.header));
+    const offset = getPrgOffset(this.header.has512BytePadding);
+    return this.bytes.slice(offset, offset + getPrgSize(this.header.prgRomPages));
   }
 
+  /**
+   * Get the CHR data for tihs cartridge.
+   *
+   * @returns {Uint8Array} The CHR memory as a byte array.
+   */
   chr() {
     if(this.header.usesChrRam)
       return new Uint8Array(CHR_PAGE_SIZE);
-    const offset = getChrOffset(this.header);
+    const offset = getPrgOffset(this.header.has512BytePadding) + getPrgSize(this.header.prgRomPages);
     return this.bytes.slice(offset, offset + this.header.chrRomPages * CHR_PAGE_SIZE);
   }
 }
