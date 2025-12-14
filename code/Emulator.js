@@ -11,6 +11,7 @@ const PPU_STEPS_PER_CPU_CYCLE = 3;
 const APU_STEPS_PER_CPU_CYCLE = 0.5;
 
 /** @import Mapper from '/lib/Mapper' */
+/** @import { Button } from "./Controller" */
 
 /**
  * A callback containing a drawn frame.
@@ -58,20 +59,6 @@ const APU_STEPS_PER_CPU_CYCLE = 0.5;
  *     controllers The active controllers.
  */
 
-/** @typedef {'BUTTON_LEFT'   |
- *            'BUTTON_RIGHT'  |
- *            'BUTTON_UP'     |
- *            'BUTTON_DOWN'   |
- *            'BUTTON_A'      |
- *            'BUTTON_B'      |
- *            'BUTTON_X'      |
- *            'BUTTON_Y'      |
- *            'BUTTON_L'      |
- *            'BUTTON_R'      |
- *            'BUTTON_START'  |
- *            'BUTTON_SELECT'
- *            } Button
- */
 
 export default class Emulator {
 
@@ -212,7 +199,6 @@ export default class Emulator {
     this._setSaveFile(saveFileBytes);
   }
 
-
   /**
    * Updates a button's state.
    *
@@ -309,13 +295,11 @@ export default class Emulator {
    * Returns an array with the save file bytes,
    * or null if the game doesn't have a save file.
    *
-   * @returns {?number[]}
+   * @returns {?number[]} The save file in the form of a number array.
    */
   getSaveFile() {
     if (!this.context) return null;
-    const { prgRam } = 
-      /** @type {typeof this.context.mapper & { prgRam: ?Uint8Array }} */
-      (this.context.mapper);
+    const { prgRam } = this.context.mapper;
     if (!prgRam) return null;
 
     return Array.from(prgRam);
@@ -433,8 +417,7 @@ export default class Emulator {
     if (!this.context) 
       return;
     const { prgRam } = 
-      /** @type {typeof this.context.mapper & { prgRam: ?Uint8Array }} */
-      (this.context.mapper);
+      this.context.mapper;
     if (!prgRam || !prgRamBytes) return;
 
     prgRam.set(prgRamBytes, 0);

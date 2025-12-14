@@ -1,8 +1,11 @@
 import Mapper from '/lib/Mapper';
 import byte from '/lib/byte';
-
-
-/** @import { MirroringId } from '../ppu/PPU' */
+/**
+ * @import { MirroringId } from '../ppu/PPU'
+ * @import CPU from '/code/cpu/CPU'
+ * @import PPU from '/code/ppu/PPU'
+ * @import Cartridge from '/code/Cartridge'
+ */
 
 /**
  * Get the mirroring type from a value.
@@ -26,9 +29,6 @@ function getMirroringId(value) {
   }
 }
 
-/** @import CPU from '/code/cpu/CPU' */
-/** @import PPU from '/code/ppu/PPU' */
-/** @import Cartridge from '/code/Cartridge' */
 
 
 export default class MMC1 extends Mapper {

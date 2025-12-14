@@ -11,7 +11,8 @@ import CNROM from './3_CNROM';
 
 /** @import Mapper from "/lib/Mapper" */
 
-/** @type {Record<number, ?typeof Mapper>} */
+
+/** @type {Partial<Record<number, typeof Mapper>>} */
 const mappers = {
   0: NROM,
   1: MMC1,
