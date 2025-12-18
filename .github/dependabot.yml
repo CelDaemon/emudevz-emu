@@ -7,3 +7,4 @@ updates:
     groups:
       updates:
         patterns: ["*"]
+    target-branch: develop
