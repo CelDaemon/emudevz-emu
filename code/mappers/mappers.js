@@ -2,7 +2,7 @@ import NROM from './0_NROM';
 import MMC1 from './1_MMC1';
 import UxROM from './2_UxROM';
 import CNROM from './3_CNROM';
-// import MMC3 from "./4_MMC3";
+import MMC3 from "./4_MMC3";
 
 
 /** @import CPU from "../cpu/CPU" */
@@ -18,7 +18,7 @@ const mappers = {
   1: MMC1,
   2: UxROM,
   3: CNROM,
-  // 4: MMC3,
+  4: MMC3,
 };
 
 /**
