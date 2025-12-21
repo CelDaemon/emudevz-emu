@@ -19,6 +19,9 @@ jobs:
         with:
           path: dist/
   deploy: 
+    concurrency:
+      cancel-in-progress: true
+      group: deploy
     permissions:
       pages: write
       id-token: write
