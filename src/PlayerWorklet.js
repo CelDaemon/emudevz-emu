@@ -1,4 +1,4 @@
-const AUDIO_BUFFER_SIZE = 4096;
+const AUDIO_BUFFER_SIZE = 8 * 1024;
 
 class RingBuffer {
 
@@ -46,6 +46,7 @@ class RingBuffer {
     enqueue(data) {
         const free = this.free;
         if(free < data.length) {
+            console.warn(`Buffer full, need: ${data.length}, have: ${free}`);
             data = data.slice(0, free);
         }
         for(let i = 0; i < data.length; i++) {
@@ -94,7 +95,6 @@ class PlayerWorklet extends AudioWorkletProcessor {
         
         const samples = this.buffer.dequeue(size);
         output.set(samples);
-        output.fill(0, samples.length);
 
         this.port.postMessage({
             need: size,

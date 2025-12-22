@@ -16,15 +16,26 @@ if(screen == null)
 const speaker = new Speaker(() => {});
 
 const emulator = new Emulator(data => {
-    screen.setBuffer(data);
+  screen.setBuffer(data);
 }, (sample) => { speaker.writeSamples(Float32Array.from([sample])); });
 
 emulator.load(new Uint8Array(await (await fetch(romUrl)).arrayBuffer()));
 document.addEventListener("click", () => speaker.start());
 
+let then = performance.now();
+const interval = 1000 / 60.098;
+
 function frame() {
+  requestAnimationFrame(frame);
+
+  const now = performance.now();
+  const delta = now - then;
+
+  if(delta >= interval) {
+    then = now - (delta % interval);
+
     emulator.frame();
-    requestAnimationFrame(frame);
+  }
 }
 
 requestAnimationFrame(frame);
