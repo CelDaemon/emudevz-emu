@@ -13,30 +13,25 @@ const screen = document.querySelector("[is=emu-screen]");
 if(screen == null)
   throw new Error("Could not get screen");
 
-const speaker = new Speaker(() => {});
+
+const samples = new Float32Array(8 * 1024);
+let sampleCursor = 0;
 
 const emulator = new Emulator(data => {
   screen.setBuffer(data);
-}, (sample) => { speaker.writeSamples(Float32Array.from([sample])); });
+}, (sample) => { samples[sampleCursor++] = sample; });
+
+
+const speaker = new Speaker(({need, have, target}) => {
+  if(have > target + 64) need--;
+  else if(have < target - 64) need++;
+  emulator.samples(need);
+  speaker.writeSamples(samples.subarray(0, sampleCursor));
+  sampleCursor = 0;
+});
 
 emulator.load(new Uint8Array(await (await fetch(romUrl)).arrayBuffer()));
 document.addEventListener("click", () => speaker.start());
-
-let then = performance.now();
-const interval = 1000 / 60.098;
-
-function frame() {
-  requestAnimationFrame(frame);
-
-  const now = performance.now();
-  const delta = now - then;
-
-  if(delta >= interval) {
-    then = now - (delta % interval);
-
-    emulator.frame();
-  }
-}
-
-requestAnimationFrame(frame);
+window.addEventListener("blur", () => speaker.pause());
+window.addEventListener("focus", () => speaker.resume());
 

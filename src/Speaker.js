@@ -78,4 +78,12 @@ export default class Speaker {
     this.#context?.close().catch(console.error);
     this.#context = null;
   }
+
+  pause() {
+    this.#context?.suspend();
+  }
+
+  resume() {
+    this.#context?.resume();
+  }
 }
