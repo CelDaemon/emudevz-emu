@@ -18,8 +18,12 @@
         "baseUrl": ".",
         "paths": {
              "/*": ["*"]
-        }
+        },
+        "types": [
+            "@types/audioworklet",
+            "vite/client"
+        ]
     },
-    "include": ["code/**/*"],
-    "exclude": ["code/tests/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["src/tests/**/*"]
 }
